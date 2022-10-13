@@ -44,28 +44,40 @@ value class JvmFieldModifiers(override val value: Int): IntBitEnum<JvmFieldModif
         val allMembers: List<JvmFieldModifiers> get() = members.asList().filterNotNull()
 
         /** No modifiers. */
+        @JvmStatic @get:JvmName("None")
         val None = JvmFieldModifiers(0)
         /** The field is accessible outside its package. */
+        @JvmStatic @get:JvmName("Public")
         val Public = JvmFieldModifiers(ACC_PUBLIC)
         /** The field is accessible only from inside its class. */
+        @JvmStatic @get:JvmName("Private")
         val Private = JvmFieldModifiers(ACC_PRIVATE)
         /** The field is accessible from inside its class and subclasses. */
+        @JvmStatic @get:JvmName("Protected")
         val Protected = JvmFieldModifiers(ACC_PROTECTED)
         /** The field is static. */
+        @JvmStatic @get:JvmName("Static")
         val Static = JvmFieldModifiers(ACC_STATIC)
         /** The field cannot be overridden. */
+        @JvmStatic @get:JvmName("Final")
         val Final = JvmFieldModifiers(ACC_FINAL)
         /** The field is volatile. */
+        @JvmStatic @get:JvmName("Volatile")
         val Volatile = JvmFieldModifiers(ACC_VOLATILE)
         /** The field is transient. */
+        @JvmStatic @get:JvmName("Transient")
         val Transient = JvmFieldModifiers(ACC_TRANSIENT)
         /** The field is not explicitly declared in the source code. */
+        @JvmStatic @get:JvmName("Synthetic")
         val Synthetic = JvmFieldModifiers(ACC_SYNTHETIC)
         /** The field is a member of an enum. */
+        @JvmStatic @get:JvmName("Enum")
         val Enum = JvmFieldModifiers(ACC_ENUM)
         /** The field is mandated by the specification. */
+        @JvmStatic @get:JvmName("Mandated")
         val Mandated = JvmFieldModifiers(ACC_MANDATED)
         /** The field is deprecated. ASM-specific. */
+        @JvmStatic @get:JvmName("Deprecated")
         val Deprecated = JvmFieldModifiers(ACC_DEPRECATED)
 
         /** The members, one name for each bit position (or `null` for undefined positions). */

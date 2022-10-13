@@ -53,32 +53,46 @@ value class JvmClassModifiers(override val value: Int): IntBitEnum<JvmClassModif
         val allMembers: List<JvmClassModifiers> get() = members.asList().filterNotNull()
 
         /** No modifiers. */
+        @JvmStatic @get:JvmName("None")
         val None = JvmClassModifiers(0)
         /** The class is accessible outside its package. */
+        @JvmStatic @get:JvmName("Public")
         val Public = JvmClassModifiers(ACC_PUBLIC)
         // Unused?
+        @JvmStatic @get:JvmName("Private")
         val Private = JvmClassModifiers(ACC_PRIVATE)
         // Unused?
+        @JvmStatic @get:JvmName("Protected")
         val Protected = JvmClassModifiers(ACC_PROTECTED)
         /** The class cannot be subclassed. */
+        @JvmStatic @get:JvmName("Final")
         val Final = JvmClassModifiers(ACC_FINAL)
         /** Treat superclass methods special when invoked with the `invokespecial` instruction. */
+        @JvmStatic @get:JvmName("Super")
         val Super = JvmClassModifiers(ACC_SUPER)
         /** The class is an interface, the class is not a class. */
+        @JvmStatic @get:JvmName("Interface")
         val Interface = JvmClassModifiers(ACC_INTERFACE)
         /** The class cannot be instantiated. */
+        @JvmStatic @get:JvmName("Abstract")
         val Abstract = JvmClassModifiers(ACC_ABSTRACT)
         /** The class is not explicitly declared in the source code. */
+        @JvmStatic @get:JvmName("Synthetic")
         val Synthetic = JvmClassModifiers(ACC_SYNTHETIC)
         /** The class is an annotation type. */
+        @JvmStatic @get:JvmName("Annotation")
         val Annotation = JvmClassModifiers(ACC_ANNOTATION)
         /** The class is an enum type. */
+        @JvmStatic @get:JvmName("Enum")
         val Enum = JvmClassModifiers(ACC_ENUM)
         // ?
+        @JvmStatic @get:JvmName("Module")
         val Module = JvmClassModifiers(ACC_MODULE)
         /** The class is a record type. */
+        @JvmStatic @get:JvmName("Record")
         val Record = JvmClassModifiers(ACC_RECORD)
         /** The class is deprecated. ASM-specific. */
+        @JvmStatic @get:JvmName("Deprecated")
         val Deprecated = JvmClassModifiers(ACC_DEPRECATED)
 
         /** The members, one name for each bit position (or `null` for undefined positions). */

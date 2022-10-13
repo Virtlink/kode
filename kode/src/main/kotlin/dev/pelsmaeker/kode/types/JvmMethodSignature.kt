@@ -5,7 +5,7 @@ import dev.pelsmaeker.kode.JvmParam
 /**
  * A JVM method signature.
  */
-data class JvmMethodSignature(
+data class JvmMethodSignature @JvmOverloads constructor(
     /** The type of the method's return value. */
     val returnType: JvmType,
     /** The method's parameters. */
@@ -15,9 +15,6 @@ data class JvmMethodSignature(
     /** The types of the method's checked throwables. */
     val throwables: List<JvmType> = emptyList(),
 ) {
-
-    constructor(returnType: JvmType)
-        : this(returnType, emptyList(), emptyList(), emptyList())
 
     /** The arity of the method. */
     val arity: Int get() = parameters.size

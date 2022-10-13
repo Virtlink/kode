@@ -31,6 +31,7 @@ class JvmClassBuilder internal constructor(
      * @param modifiers the method's modifiers
      * @return a [JvmMethodBuilder]
      */
+    @JvmName("createMethod")
     fun createMethod(method: JvmMethodRef, modifiers: JvmMethodModifiers): JvmMethodBuilder {
         require(modifiers.contains(JvmMethodModifiers.Static) == method.isStatic) {
             if (method.isStatic) "Static method without 'static' modifier." else "Instance method with 'static' modifier."

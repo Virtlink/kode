@@ -1,4 +1,4 @@
-package dev.pelsmaeker.kode.examples
+package examples
 
 import dev.pelsmaeker.kode.*
 import dev.pelsmaeker.kode.types.*
@@ -6,16 +6,18 @@ import org.junit.jupiter.api.Test
 import java.io.PrintStream
 
 /**
- * Shows a simple program that creates a static main() method which prints "Hello, World!".
+ * A simple Kotlin program that builds a static main() method which prints "Hello, World!".
  */
-class HelloWorld {
+class HelloWorldKt {
 
     @Test
     fun test() {
         val jvm = Jvm()
         val pkgRef = JvmPackageRef("com/example")
         val classDecl = JvmClassDecl("HelloWorld", pkgRef)
-        val methodRef = JvmMethodRef("main", classDecl.ref(), false, JvmMethodSignature(JvmVoid, listOf(JvmParam(JvmArray(JvmTypes.String.ref()), "args"))))
+        val methodRef = JvmMethodRef("main", classDecl.ref(), false,
+            JvmMethodSignature(JvmVoid, listOf(JvmParam(JvmArray(JvmTypes.String.ref()), "args")))
+        )
 
         // package com.example
         // public class HelloWorld
@@ -36,7 +38,8 @@ class HelloWorld {
 
         compiledClass.check()
         val cls = compiledClass.load<Any>()
-        cls.getMethod("main", Array<String>::class.java).invoke(null, arrayOf<String>())
+        val method = cls.getMethod("main", Array<String>::class.java)
+        method.invoke(null, arrayOf<String>())
     }
 
 }

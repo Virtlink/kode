@@ -43,12 +43,16 @@ value class JvmParamModifiers(override val value: Int): IntBitEnum<JvmParamModif
         val allMembers: List<JvmParamModifiers> get() = members.asList().filterNotNull()
 
         /** No modifiers. */
+        @JvmStatic @get:JvmName("None")
         val None = JvmParamModifiers(0)
         /** The parameter cannot be assigned after its construction. */
+        @JvmStatic @get:JvmName("Final")
         val Final = JvmParamModifiers(ACC_FINAL)
         /** The parameter is not explicitly declared in the source code. */
+        @JvmStatic @get:JvmName("Synthetic")
         val Synthetic = JvmParamModifiers(ACC_SYNTHETIC)
         /** The parameter was not explicitly declared in the source code but implicitly mandated by the specification. */
+        @JvmStatic @get:JvmName("Mandated")
         val Mandated = JvmParamModifiers(ACC_MANDATED)
 
         /** The members, one name for each bit position (or `null` for undefined positions). */

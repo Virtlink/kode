@@ -45,6 +45,7 @@ class JvmCompiledClass(
      * @param T the type of class this is
      * @return the loaded class
      */
+    @JvmOverloads
     fun <T> load(classLoader: ClassLoader = JvmCompiledClass::class.java.classLoader): Class<T> {
         val dynamicClassLoader = DynamicClassLoader(classLoader)
         @Suppress("UNCHECKED_CAST")

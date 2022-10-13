@@ -19,6 +19,16 @@ data class JvmParam(
     /** Modifiers for the parameter. */
     val modifiers: JvmParamModifiers = JvmParamModifiers.None,
 ) {
+
+    constructor(
+        type: JvmType,
+        name: String?,
+    ): this(type, name, JvmParamModifiers.None)
+
+    constructor(
+        type: JvmType,
+    ): this(type, null, JvmParamModifiers.None)
+
     /** Whether this parameter is implicitly declared (i.e., mandated). */
     val isImplicit: Boolean get() = modifiers.contains(JvmParamModifiers.Mandated)
 

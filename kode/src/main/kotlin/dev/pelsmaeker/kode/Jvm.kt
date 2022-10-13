@@ -58,6 +58,13 @@ class Jvm(
         )
     }
 
+    // For Java
+    @JvmName("createClass")
+    fun createClass(
+        declaration: JvmClassDecl,
+        modifiers: JvmClassModifiers,
+    ): JvmClassBuilder = createClass(declaration, modifiers, JvmClassSignature())
+
     companion object {
         /** Regex pattern asserting that an identifier is a valid JVM class name. */
         private val classPattern = Pattern.compile(

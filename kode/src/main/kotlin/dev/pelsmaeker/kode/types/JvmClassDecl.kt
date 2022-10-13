@@ -9,7 +9,7 @@ import java.nio.file.Path
  * A class declaration specifies the kind of class (class or interface), its supertypes,
  * and its type parameters (if any).
  */
-data class JvmClassDecl(
+data class JvmClassDecl @JvmOverloads constructor(
     /** The name of the class. If this is a nested class, the name is preceded by the name of the enclosing class, separated with a dollar sign (`$`). */
     val name: String,
     /** The package that contains the class. */
