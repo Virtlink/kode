@@ -10,10 +10,10 @@ import java.nio.file.Path
  * and its type parameters (if any).
  */
 data class JvmClassDecl(
-    /** The package that contains the class. */
-    val pkg: JvmPackageRef,
     /** The name of the class. If this is a nested class, the name is preceded by the name of the enclosing class, separated with a dollar sign (`$`). */
     val name: String,
+    /** The package that contains the class. */
+    val pkg: JvmPackageRef,
     /** Whether this is an interface. This influences the generated instructions used to invoke members of this class. */
     val isInterface: Boolean = false,
     /** The type parameters of this class. */
@@ -31,18 +31,18 @@ data class JvmClassDecl(
     )
 
     constructor(
-        pkg: JvmPackageRef,
         name: String,
-        isInterface: Boolean,
+        pkg: JvmPackageRef,
+        isInterface: Boolean = false,
         vararg typeParameters: JvmTypeParam,
-    ) : this(pkg, name, isInterface, typeParameters.toList(), null)
+    ) : this(name, pkg, isInterface, typeParameters.toList(), null)
 
     constructor(
-        pkg: JvmPackageRef,
         name: String,
-        isInterface: Boolean,
+        pkg: JvmPackageRef,
+        isInterface: Boolean = false,
         vararg typeParameterNames: String,
-    ) : this(pkg, name, isInterface, typeParameterNames.map { JvmTypeParam(name) }, null)
+    ) : this(name, pkg, isInterface, typeParameterNames.map { JvmTypeParam(name) }, null)
 
     /** Whether this is a class. This influences the generated instructions used to invoke members of this class. */
     val isClass: Boolean get() = !isInterface
@@ -186,8 +186,8 @@ data class JvmClassDecl(
                 className = cls.simpleName
             }
             return JvmClassDecl(
-                pkg,
                 className,
+                pkg,
                 isInterface,
                 typeParams,
                 enclosingClass

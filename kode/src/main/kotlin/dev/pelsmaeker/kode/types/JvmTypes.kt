@@ -41,6 +41,8 @@ object JvmTypes {
     val NullPointerException = JvmClassDecl.of(java.lang.NullPointerException::class.java)
     /** Class [java.util.List]. */
     val List = JvmClassDecl.of(java.util.List::class.java)
+    /** Class [java.lang.System]. */
+    val System = JvmClassDecl.of(java.lang.System::class.java)
 
     /**
      * Gets a reference to the package with the specified internal name.
