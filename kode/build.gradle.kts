@@ -15,6 +15,7 @@ dependencies {
 
     // ASM
     implementation      (libs.asm)
+    implementation      (libs.asm.util)
 
     // Testing
     testImplementation  (libs.junit.core)
