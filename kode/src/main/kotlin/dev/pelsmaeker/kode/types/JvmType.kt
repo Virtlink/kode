@@ -6,8 +6,11 @@ import java.lang.reflect.*
 
 /**
  * A JVM type.
+ *
+ * Use [of] to create an instance of this interface from a [Type] or [Class].
  */
 interface JvmType {
+
     /** The sort of type. */
     val sort: JvmTypeSort
 
@@ -34,4 +37,43 @@ interface JvmType {
 
     /** Whether this is a type variable. */
     val isTypeVariable: Boolean
+
+    companion object {
+        /**
+         * Gets the JVM type of the specified type.
+         *
+         * @param type the type
+         * @return the JVM type
+         */
+        @Suppress("UNCHECKED_CAST")
+        fun of(type: Type): JvmType = when (type) {
+            is ParameterizedType -> JvmClassRef.of(type)
+            is GenericArrayType -> TODO()
+            is TypeVariable<*> -> JvmTypeVar.of(type as TypeVariable<out Class<*>?>)
+            is WildcardType -> TODO()
+            is Class<*> -> of(type)
+            else -> error("Unsupported type ${type::class.java}: $type")
+        }
+
+        /**
+         * Gets the JVM type of the specified type.
+         *
+         * @param cls the type
+         * @return the JVM type
+         */
+        fun of(cls: Class<*>): JvmType = when {
+            cls.isArray -> JvmArray(of(cls.componentType))
+            !cls.isPrimitive -> JvmClassDecl.of(cls).ref() /* FIXME: Not sure this is correct? */
+            cls == java.lang.Void.TYPE -> JvmVoid
+            cls == java.lang.Boolean.TYPE -> JvmBoolean
+            cls == java.lang.Character.TYPE -> JvmCharacter
+            cls == java.lang.Byte.TYPE -> JvmByte
+            cls == java.lang.Short.TYPE -> JvmShort
+            cls == java.lang.Integer.TYPE -> JvmInteger
+            cls == java.lang.Long.TYPE -> JvmLong
+            cls == java.lang.Float.TYPE -> JvmFloat
+            cls == java.lang.Double.TYPE -> JvmDouble
+            else -> error("Unhandled type: $cls")
+        }
+    }
 }

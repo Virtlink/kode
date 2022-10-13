@@ -13,6 +13,9 @@ versions                        = { id = "com.github.ben-manes.versions",       
 
 
 [libraries]
+# Kotlin
+kotlin-reflect                  = { module = "org.jetbrains.kotlin:kotlin-reflect",                         version.ref = "kotlin" }
+
 # ASM
 asm                             = { module = "org.ow2.asm:asm",                                             version.ref = "asm" }
 asm-util                        = { module = "org.ow2.asm:asm-util",                                        version.ref = "asm" }

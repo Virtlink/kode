@@ -18,6 +18,7 @@ dependencies {
     implementation      (libs.asm.util)
 
     // Testing
+    testImplementation  (libs.kotlin.reflect)
     testImplementation  (libs.junit.core)
     testImplementation  (libs.junit.api)
     testImplementation  (libs.junit.engine)

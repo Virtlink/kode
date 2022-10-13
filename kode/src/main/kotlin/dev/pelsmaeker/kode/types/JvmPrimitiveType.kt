@@ -33,7 +33,7 @@ object JvmVoid: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Void
     override val kind get() = JvmTypeKind.Void
     override val descriptor get() = "V"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.VoidClass.ref()
     override fun toString() = "void"
 }
 
@@ -45,7 +45,7 @@ object JvmBoolean: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Boolean
     override val kind get() = JvmTypeKind.Integer
     override val descriptor get() = "Z"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.BooleanClass.ref()
     override fun toString() = "boolean"
 }
 
@@ -57,7 +57,7 @@ object JvmCharacter: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Character
     override val kind get() = JvmTypeKind.Integer
     override val descriptor get() = "C"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.CharacterClass.ref()
     override fun toString() = "char"
 }
 
@@ -69,7 +69,7 @@ object JvmByte: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Byte
     override val kind get() = JvmTypeKind.Integer
     override val descriptor get() = "B"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.ByteClass.ref()
     override fun toString() = "byte"
 }
 
@@ -81,7 +81,7 @@ object JvmShort: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Short
     override val kind get() = JvmTypeKind.Integer
     override val descriptor get() = "S"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.ShortClass.ref()
     override fun toString() = "short"
 }
 
@@ -93,7 +93,7 @@ object JvmInteger: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Integer
     override val kind get() = JvmTypeKind.Integer
     override val descriptor get() = "I"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.IntegerClass.ref()
     override fun toString() = "int"
 }
 
@@ -105,7 +105,7 @@ object JvmLong: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Long
     override val kind get() = JvmTypeKind.Long
     override val descriptor get() = "J"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.LongClass.ref()
     override fun toString() = "long"
 }
 
@@ -117,7 +117,7 @@ object JvmFloat: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Float
     override val kind get() = JvmTypeKind.Float
     override val descriptor get() = "F"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.FloatClass.ref()
     override fun toString() = "float"
 }
 
@@ -129,6 +129,6 @@ object JvmDouble: JvmPrimitiveType {
     override val sort get() = JvmTypeSort.Double
     override val kind get() = JvmTypeKind.Double
     override val descriptor get() = "D"
-    override fun boxed() = TODO()
+    override fun boxed() = JvmTypes.DoubleClass.ref()
     override fun toString() = "double"
 }
