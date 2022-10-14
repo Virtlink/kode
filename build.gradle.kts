@@ -78,13 +78,9 @@ subprojects {
             maven {
                 name = "GitHub"
                 url = uri("https://maven.pkg.github.com/Virtlink/kode-jvm")
-
                 credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
-                }
-                authentication {
-                    create<HttpHeaderAuthentication>("header")
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
                 }
             }
         }
