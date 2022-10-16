@@ -162,9 +162,11 @@ class JvmScopeBuilder(
             else -> throw UnsupportedOperationException("Unsupported type: " + variable.type)
         }
     }
+
     ///////////////////////////
     // STORE LOCAL VARIABLES //
     ///////////////////////////
+
     /**
      * Store the `int` on top of the stack into a local variable.
      *
@@ -227,9 +229,11 @@ class JvmScopeBuilder(
             else -> throw UnsupportedOperationException("Unsupported type: " + variable.type)
         }
     }
+
     /////////////////////
     // LOCAL VARIABLES //
     /////////////////////
+
     /**
      * Increment an `int` local variable by a constant value.
      *

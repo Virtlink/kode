@@ -54,6 +54,11 @@ subprojects {
         useJUnitPlatform()
     }
 
+    configure<JavaPluginExtension> {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
     tasks.withType<UsesKotlinJavaToolchain>().configureEach {
         val service = project.extensions.getByType<JavaToolchainService>()
         val customLauncher = service.launcherFor {

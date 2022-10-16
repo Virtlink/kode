@@ -118,7 +118,7 @@ abstract class Scoped<SELF : Scoped<SELF>> protected constructor(
      */
     private fun checkChildless() {
         check(children.isEmpty()) {
-            "The scope cannot be used, because it has open child scopes: " + getDescendants().joinToString(limit = 10) { it.getFullName(this) }
+            "This scope $name cannot be used, because it has open child scopes: " + getDescendants().joinToString(limit = 10) { it.getFullName(this) }
         }
     }
 
