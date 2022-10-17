@@ -10,20 +10,22 @@ class JvmFieldDecl(
     val name: String,
     /** The class that declares this field. */
     val owner: JvmClassDecl,
-    /** The modifiers of the field. If this field is purely used as a reference, the only relevant modifier is [JvmFieldModifiers.Static]. */
+    /** The modifiers of the field. */
     val modifiers: JvmFieldModifiers,
-    /** The type of the field. */
-    val type: JvmType,
+    /** The signature of the field. */
+    val signature: JvmFieldSignature,
 ) {
+
+    /** The debug name of the field. */
+    val debugName: String get() = name
 
     /** Whether this is a static field. This influences the generated instructions used to get/set the field. */
     val isStatic: Boolean get() = modifiers.contains(JvmFieldModifiers.Static)
-
     /** Whether this is an instance field. This influences the generated instructions used to get/set the field. */
     val isInstance: Boolean get() = !isStatic
 
     /**
-     * Creates a reference to this declaration.
+     * Gets a reference to this declaration.
      */
     fun ref(): JvmFieldRef = TODO()
 
@@ -33,6 +35,6 @@ class JvmFieldDecl(
         append('.')
         append(name)
         append(": ")
-        append(type)
+        append(signature)
     }.toString()
 }

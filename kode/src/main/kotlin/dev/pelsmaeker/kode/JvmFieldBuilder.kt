@@ -1,5 +1,6 @@
 package dev.pelsmaeker.kode
 
+import dev.pelsmaeker.kode.types.JvmFieldDecl
 import dev.pelsmaeker.kode.types.JvmFieldRef
 import org.objectweb.asm.FieldVisitor
 
@@ -8,13 +9,13 @@ import org.objectweb.asm.FieldVisitor
  *
  * Call [build] when done with this builder.
  */
-class JvmFieldBuilder(
+class JvmFieldBuilder internal constructor(
     /** The owning class builder. */
     val classBuilder: JvmClassBuilder,
-    /** A reference to the field being built. */
-    val reference: JvmFieldRef,
+    /** The declaration of the field being built. */
+    val declaration: JvmFieldDecl,
     /** The field visitor. */
-    val fieldVisitor: FieldVisitor,
+    internal val fieldVisitor: FieldVisitor,
 ) : AutoCloseable {
 
     /** Whether this builder was closed. */
@@ -34,17 +35,16 @@ class JvmFieldBuilder(
      * Builds a field from this field builder,
      * and closes the builder.
      *
-     * @return the reference to the field
+     * @return the declaration of the built field
      */
-    fun build(): JvmFieldRef {
+    fun build(): JvmFieldDecl {
         @Suppress("DEPRECATION")
         close()
-        return reference
+        return declaration
     }
 
-    override fun toString(): String {
-        return reference.toString()
-    }
+    override fun toString(): String =
+        "${declaration.owner}::${declaration.debugName}"
 
     /**
      * Checks that the object is usable.

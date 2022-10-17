@@ -11,7 +11,7 @@ class JvmMethodDecl(
     val name: String?,
     /** The class that declares this method. */
     val owner: JvmClassDecl,
-    /** The modifiers of the method. If this method is purely used as a reference, the only relevant modifier is [JvmMethodModifiers.Static]. */
+    /** The modifiers of the method. */
     val modifiers: JvmMethodModifiers,
     /** The signature of the method. */
     val signature: JvmMethodSignature,
@@ -80,7 +80,8 @@ class JvmMethodDecl(
     }
 
     override fun toString(): String = StringBuilder().apply {
-        append(if (isStatic) "static method " else "instance method ")
+        append(if (isStatic) "static " else "instance ")
+        append(if (isConstructor) "constructor " else "method ")
         if (typeParameters.isNotEmpty()) typeParameters.joinTo(this, prefix = "<", postfix = "> ")
         append(owner.javaName)
         append('.')

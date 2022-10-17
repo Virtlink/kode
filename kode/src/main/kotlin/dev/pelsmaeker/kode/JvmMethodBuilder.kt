@@ -21,7 +21,7 @@ class JvmMethodBuilder internal constructor(
 //    /** The reference to the method being built. */
 //    val reference: JvmMethodRef,
     /** The method visitor. */
-    val methodVisitor: MethodVisitor,
+    internal val methodVisitor: MethodVisitor,
     /** The method eponymizer. */
     val eponymizer: Eponymizer,
 ): AutoCloseable {
@@ -97,7 +97,7 @@ class JvmMethodBuilder internal constructor(
      * Builds a method from this method builder,
      * and closes the builder.
      *
-     * @return the reference to the method
+     * @return the declaration of the built method
      */
     fun build(): JvmMethodDecl {
         @Suppress("DEPRECATION")

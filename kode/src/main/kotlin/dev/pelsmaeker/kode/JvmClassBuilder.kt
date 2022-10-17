@@ -330,16 +330,26 @@ class JvmClassBuilder internal constructor(
     }
 
     /**
-     * Creates a field with the specified definition and value.
+     * Creates a field.
      *
      * Call [JvmFieldBuilder.build] (or [JvmFieldBuilder.close]) when done with the returned builder.
      *
-     * @param field the field's definition
-     * @param modifiers the field's modifiers
+     * @param declaration the declaration of the field to build
+     * @param value the field's value, which may be `null`
      * @return the field builder
      */
-    fun createField(field: JvmFieldRef, modifiers: JvmFieldModifiers): JvmFieldBuilder {
-        return createField(field, modifiers, null)
+    fun createField(declaration: JvmFieldDecl, value: Any? = null): JvmFieldBuilder {
+        require(declaration.owner == this.declaration) {
+            "Field is declared in ${declaration.owner}, but the class being built is ${this.declaration}."
+        }
+        val fieldVisitor: org.objectweb.asm.FieldVisitor = classWriter.visitField(
+            declaration.modifiers.value,
+            declaration.name,
+            declaration.signature.descriptor,
+            null,  // TODO: When to add a signature? When it has a type argument? type.getSignature()
+            value
+        )
+        return JvmFieldBuilder(this, declaration, fieldVisitor)
     }
 
     /**
@@ -347,24 +357,38 @@ class JvmClassBuilder internal constructor(
      *
      * Call [JvmFieldBuilder.build] (or [JvmFieldBuilder.close]) when done with the returned builder.
      *
-     * @param field the field's definition
-     * @param modifiers the field's modifiers
+     * @param name the name of the field
+     * @param modifiers the modifiers of the field
+     * @param signature the signature of the field
      * @param value the field's value, which may be `null`
-     * @return a [JvmFieldBuilder]
+     * @return the field builder
      */
-    fun createField(field: JvmFieldRef, modifiers: JvmFieldModifiers, value: Any?): JvmFieldBuilder {
-        require(
-            modifiers.contains(JvmFieldModifiers.Static) == field.isStatic
-        ) { if (field.isStatic) "Static field without 'static' modifier." else "Instance field with 'static' modifier." }
-        val fieldVisitor: org.objectweb.asm.FieldVisitor = classWriter.visitField(
-            modifiers.value,
-            field.name,
-            field.signature.descriptor,
-            null,  // TODO: When to add a signature? When it has a type argument? type.getSignature()
-            value
-        )
-        return JvmFieldBuilder(this, field, fieldVisitor)
-    }
+    @JvmName("createField")
+    fun createField(
+        name: String,
+        modifiers: JvmFieldModifiers,
+        signature: JvmFieldSignature,
+        value: Any? = null
+    ): JvmFieldBuilder = createField(JvmFieldDecl(name, declaration, modifiers, signature), value)
+
+    /**
+     * Creates a field with the specified definition and value.
+     *
+     * Call [JvmFieldBuilder.build] (or [JvmFieldBuilder.close]) when done with the returned builder.
+     *
+     * @param name the name of the field
+     * @param modifiers the modifiers of the field
+     * @param type the type of the field
+     * @param value the field's value, which may be `null`
+     * @return the field builder
+     */
+    @JvmName("createField")
+    fun createField(
+        name: String,
+        modifiers: JvmFieldModifiers,
+        type: JvmType,
+        value: Any? = null
+    ): JvmFieldBuilder = createField(name, modifiers, JvmFieldSignature(type), value)
 
     /**
      * Gets a fresh lambda name in this scope.
