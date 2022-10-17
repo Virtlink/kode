@@ -12,7 +12,7 @@ import org.objectweb.asm.ClassWriter
  */
 class JvmClassBuilder internal constructor(
     /** The owning program builder. */
-    val programBuilder: JvmProgramBuilder,
+    val moduleBuilder: JvmModuleBuilder,
     /** The declaration of the class being built. */
     val declaration: JvmClassDecl,
     /** The class writer. */

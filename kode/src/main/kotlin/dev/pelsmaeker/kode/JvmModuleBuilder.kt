@@ -9,15 +9,15 @@ import java.util.regex.Pattern
 
 
 /**
- * Builds a JVM program.
+ * Builds a JVM module.
  *
  * Call [build] when done with this builder.
  */
-class JvmProgramBuilder(
+class JvmModuleBuilder(
     /** The class version to use. */
     private val classVersion: JvmClassVersion = JvmClassVersion.Java8,
-    /** The root eponymizer. */
-    private val eponymizer: Eponymizer = Eponymizer(),
+    /** The module eponymizer. */
+    val eponymizer: Eponymizer = Eponymizer(),
     /** Whether to compute the maxs. */
     private val computeMaxs: Boolean = true,
     /** Whether to compute the frames. */
