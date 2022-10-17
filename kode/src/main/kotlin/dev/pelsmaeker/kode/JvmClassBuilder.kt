@@ -11,15 +11,14 @@ import org.objectweb.asm.ClassWriter
  * Call [build] when done with this builder.
  */
 class JvmClassBuilder internal constructor(
+    /** The owning program builder. */
+    val programBuilder: JvmProgramBuilder,
     /** The declaration of the class being built. */
     val declaration: JvmClassDecl,
     /** The class writer. */
     val classWriter: ClassWriter,
     private val eponymizer: Eponymizer,
 ) : AutoCloseable {
-
-    /** Whether this builder was closed. */
-    private var closed = false
 
     /**
      * Creates a method with the specified modifiers.
@@ -296,7 +295,7 @@ class JvmClassBuilder internal constructor(
             null,  // TODO: When to add a signature? When it has a type argument? type.getSignature()
             value
         )
-        return JvmFieldBuilder(field, fieldVisitor)
+        return JvmFieldBuilder(this, field, fieldVisitor)
     }
 
     /**
@@ -324,6 +323,9 @@ class JvmClassBuilder internal constructor(
         val returnType: JvmType = signature.returnType
         return JvmMethodSignature(returnType, parameters)
     }
+
+    /** Whether this builder was closed. */
+    private var closed = false
 
     @Deprecated("Prefer using build()")
     override fun close() {

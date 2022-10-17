@@ -9,9 +9,11 @@ import java.util.regex.Pattern
 
 
 /**
- * JVM methods.
+ * Builds a JVM program.
+ *
+ * Call [build] when done with this builder.
  */
-class Jvm(
+class JvmProgramBuilder(
     /** The class version to use. */
     private val classVersion: JvmClassVersion = JvmClassVersion.Java8,
     /** The root eponymizer. */
@@ -20,7 +22,7 @@ class Jvm(
     private val computeMaxs: Boolean = true,
     /** Whether to compute the frames. */
     private val computeFrames: Boolean = true,
-) {
+): AutoCloseable {
 
     /**
      * Build a class or interface.
@@ -52,6 +54,7 @@ class Jvm(
             superInterfacesInternalNames
         )
         return JvmClassBuilder(
+            this,
             declaration,
             classWriter,
             eponymizer.scope(declaration.toString())
@@ -64,6 +67,27 @@ class Jvm(
         declaration: JvmClassDecl,
         modifiers: JvmClassModifiers,
     ): JvmClassBuilder = createClass(declaration, modifiers, JvmClassSignature())
+
+
+    /** Whether this builder was closed. */
+    private var closed = false
+
+    @Deprecated("Prefer using build()")
+    override fun close() {
+        if (closed) return
+        closed = true
+    }
+
+    /**
+     * Builds Unit from this program builder,
+     * and closes the builder.
+     *
+     * @return Unit
+     */
+    fun build(): Unit {
+        @Suppress("DEPRECATION")
+        close()
+    }
 
     companion object {
         /** Regex pattern asserting that an identifier is a valid JVM class name. */

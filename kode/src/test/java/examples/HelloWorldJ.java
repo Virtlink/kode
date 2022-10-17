@@ -1,6 +1,6 @@
 package examples;
 
-import dev.pelsmaeker.kode.Jvm;
+import dev.pelsmaeker.kode.JvmProgramBuilder;
 import dev.pelsmaeker.kode.JvmClassBuilder;
 import dev.pelsmaeker.kode.JvmClassModifiers;
 import dev.pelsmaeker.kode.JvmCompiledClass;
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,7 +31,7 @@ public class HelloWorldJ {
 
     @Test
     public void test() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        final Jvm jvm = new Jvm();
+        final JvmProgramBuilder jvmProgramBuilder = new JvmProgramBuilder();
         final JvmPackageRef pkgRef = new JvmPackageRef("com/example");
         final JvmClassDecl classDecl = new JvmClassDecl("HelloWorld", pkgRef);
         final JvmMethodRef methodRef = new JvmMethodRef("main", classDecl.ref(), false,
@@ -41,7 +40,7 @@ public class HelloWorldJ {
 
         // package com.example
         // public class HelloWorld
-        final JvmClassBuilder classBuilder = jvm.createClass(classDecl, JvmClassModifiers.Public());
+        final JvmClassBuilder classBuilder = jvmProgramBuilder.createClass(classDecl, JvmClassModifiers.Public());
         try (classBuilder) {
             // public static void main(String[] args)
             try (final JvmMethodBuilder methodBuilder = classBuilder.createMethod(methodRef, JvmMethodModifiers.Public() | JvmMethodModifiers.Static())) {

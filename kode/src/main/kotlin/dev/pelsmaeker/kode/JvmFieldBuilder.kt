@@ -9,6 +9,8 @@ import org.objectweb.asm.FieldVisitor
  * Call [build] when done with this builder.
  */
 class JvmFieldBuilder(
+    /** The owning class builder. */
+    val classBuilder: JvmClassBuilder,
     /** A reference to the field being built. */
     val reference: JvmFieldRef,
     /** The field visitor. */

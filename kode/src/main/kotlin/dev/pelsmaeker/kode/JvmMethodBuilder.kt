@@ -12,7 +12,7 @@ import org.objectweb.asm.MethodVisitor
  * Call [build] when done with this builder.
  */
 class JvmMethodBuilder internal constructor(
-    /** The builder of the class that this method belongs to. */
+    /** The owning class builder. */
     val classBuilder: JvmClassBuilder,
     /** The reference to the method being built. */
     val reference: JvmMethodRef,

@@ -12,7 +12,7 @@ class HelloWorldKt {
 
     @Test
     fun test() {
-        val jvm = Jvm()
+        val jvmProgramBuilder = JvmProgramBuilder()
         val pkgRef = JvmPackageRef("com/example")
         val classDecl = JvmClassDecl("HelloWorld", pkgRef)
         val methodRef = JvmMethodRef("main", classDecl.ref(), false,
@@ -21,7 +21,7 @@ class HelloWorldKt {
 
         // package com.example
         // public class HelloWorld
-        val compiledClass = jvm.createClass(classDecl, JvmClassModifiers.Public).apply {
+        val compiledClass = jvmProgramBuilder.createClass(classDecl, JvmClassModifiers.Public).apply {
             // public static void main(String[] args)
             createMethod(methodRef, JvmMethodModifiers.Public or JvmMethodModifiers.Static).apply {
                 beginCode().apply {
