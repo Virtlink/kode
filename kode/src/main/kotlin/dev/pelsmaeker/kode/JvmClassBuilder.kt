@@ -16,7 +16,7 @@ class JvmClassBuilder internal constructor(
     /** The declaration of the class being built. */
     val declaration: JvmClassDecl,
     /** The class writer. */
-    val classWriter: ClassWriter,
+    internal val classWriter: ClassWriter,
     /** The class eponymizer. */
     val eponymizer: Eponymizer,
 ) : AutoCloseable {
@@ -92,31 +92,6 @@ class JvmClassBuilder internal constructor(
         modifiers,
         JvmMethodSignature(returnType, parameters, typeParameters, throwableTypes)
     )
-
-//    /**
-//     * Creates a method with the specified modifiers.
-//     *
-//     * Call [JvmMethodBuilder.beginCode] to start adding instructions to the method's body.
-//     * Call [JvmMethodBuilder.build] when done with the returned builder.
-//     *
-//     * @param method the method's reference
-//     * @param modifiers the method's modifiers
-//     * @return a [JvmMethodBuilder]
-//     */
-//    @JvmName("createMethod")
-//    fun createMethod(method: JvmMethodRef, modifiers: JvmMethodModifiers): JvmMethodBuilder {
-//        require(modifiers.contains(JvmMethodModifiers.Static) == method.isStatic) {
-//            if (method.isStatic) "Static method without 'static' modifier." else "Instance method with 'static' modifier."
-//        }
-//        val methodVisitor: org.objectweb.asm.MethodVisitor = classWriter.visitMethod(
-//            modifiers.value,
-//            method.name,
-//            method.signature.descriptor,
-//            null,  //method.signature.signature,   // TODO: When to add signature?
-//            method.signature.throwableTypes.map(JvmType::descriptor).toTypedArray()
-//        )
-//        return JvmMethodBuilder(this, method, methodVisitor, eponymizer.scope(method.name))
-//    }
 
     /**
      * Creates a bridge method, bridging from the specified signature to another signature with the same arity.
