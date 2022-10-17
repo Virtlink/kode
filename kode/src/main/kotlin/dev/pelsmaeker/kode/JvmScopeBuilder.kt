@@ -2,6 +2,7 @@ package dev.pelsmaeker.kode
 
 import dev.pelsmaeker.kode.utils.Scoped
 import dev.pelsmaeker.kode.types.*
+import dev.pelsmaeker.kode.utils.Eponymizer
 import org.objectweb.asm.Type
 
 /**
@@ -17,6 +18,8 @@ class JvmScopeBuilder(
     name: String? = methodBuilder.toString(),
     /** The parent scope builder; or `null`. */
     parent: JvmScopeBuilder? = null,
+    /** The scope eponymizer. */
+    val eponymizer: Eponymizer,
 ): Scoped<JvmScopeBuilder>(name, parent), JvmScope {
 
     /** The label for the start of the scope. */
@@ -45,7 +48,7 @@ class JvmScopeBuilder(
      * @return a new child scope
      */
     fun scope(name: String? = null): JvmScopeBuilder {
-        return adoptChild(JvmScopeBuilder(methodBuilder, name ?: methodBuilder.toString(), this))
+        return adoptChild(JvmScopeBuilder(methodBuilder, name ?: methodBuilder.toString(), eponymizer = eponymizer.scope(name ?: methodBuilder.toString())))
     }
 
     @Deprecated("Prefer using build()")
@@ -54,6 +57,8 @@ class JvmScopeBuilder(
 
         // Add the end label
         methodBuilder.methodVisitor.visitLabel(endLabel.internalLabel)
+        
+        eponymizer.close()
     }
 
     /**

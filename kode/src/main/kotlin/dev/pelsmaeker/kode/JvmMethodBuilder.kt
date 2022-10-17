@@ -2,6 +2,7 @@ package dev.pelsmaeker.kode
 
 
 import dev.pelsmaeker.kode.types.JvmMethodRef
+import dev.pelsmaeker.kode.utils.Eponymizer
 import org.objectweb.asm.MethodVisitor
 
 
@@ -18,6 +19,8 @@ class JvmMethodBuilder internal constructor(
     val reference: JvmMethodRef,
     /** The method visitor. */
     val methodVisitor: MethodVisitor,
+    /** The method eponymizer. */
+    val eponymizer: Eponymizer,
 ): AutoCloseable {
 
     /** A list of local variables declared anywhere in the method's body. */
@@ -39,7 +42,7 @@ class JvmMethodBuilder internal constructor(
     fun beginCode(): JvmScopeBuilder {
         checkUsable()
         methodVisitor.visitCode()
-        val jvmScopeBuilder = JvmScopeBuilder(this)
+        val jvmScopeBuilder = JvmScopeBuilder(this, eponymizer = eponymizer.scope(reference.name))
         bodyScope = jvmScopeBuilder
         initializeLocalVars(jvmScopeBuilder.localVars)
         return jvmScopeBuilder
@@ -84,6 +87,7 @@ class JvmMethodBuilder internal constructor(
         // Add the method's frame information. (Incorrect, but will be fixed by ASM library.)
         methodVisitor.visitMaxs(0, 0)
         methodVisitor.visitEnd()
+        eponymizer.close()
     }
 
     /**

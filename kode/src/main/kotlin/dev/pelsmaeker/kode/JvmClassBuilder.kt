@@ -17,7 +17,8 @@ class JvmClassBuilder internal constructor(
     val declaration: JvmClassDecl,
     /** The class writer. */
     val classWriter: ClassWriter,
-    private val eponymizer: Eponymizer,
+    /** The class eponymizer. */
+    val eponymizer: Eponymizer,
 ) : AutoCloseable {
 
     /**
@@ -42,7 +43,7 @@ class JvmClassBuilder internal constructor(
             null,  //method.signature.signature,   // TODO: When to add signature?
             method.signature.throwables.map(JvmType::descriptor).toTypedArray()
         )
-        return JvmMethodBuilder(this, method, methodVisitor)
+        return JvmMethodBuilder(this, method, methodVisitor, eponymizer.scope(method.name))
     }
 
     /**
