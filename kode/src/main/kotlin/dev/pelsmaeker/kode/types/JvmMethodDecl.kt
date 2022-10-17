@@ -4,7 +4,7 @@ import dev.pelsmaeker.kode.JvmMethodModifiers
 import dev.pelsmaeker.kode.JvmParam
 
 /**
- * A method declaration.
+ * A JVM method declaration.
  */
 class JvmMethodDecl(
     /** The name of the method; or `null` when it is a static or instance constructor. */
@@ -13,15 +13,21 @@ class JvmMethodDecl(
     val owner: JvmClassDecl,
     /** The modifiers of the method. If this method is purely used as a reference, the only relevant modifier is [JvmMethodModifiers.Static]. */
     val modifiers: JvmMethodModifiers,
-    /** The return type of the method. */
-    val returnType: JvmType,
-    /** The parameters of the method. */
-    val parameters: List<JvmParam> = emptyList(),
-    /** The type parameters of the method. */
-    val typeParameters: List<JvmTypeParam> = emptyList(),
-    /** The checked throwable types of the method. */
-    val throwableTypes: List<JvmType> = emptyList(),
+    /** The signature of the method. */
+    val signature: JvmMethodSignature,
 ) {
+
+    /** The debug name of the method, which is the name of the method or a special identifier if it's a constructor. */
+    val debugName: String get() = name ?: if (isInstance) "<init>" else "<cinit>"
+
+    /** The type of the method's return value. */
+    val returnType: JvmType get() = signature.returnType
+    /** The parameters of the method. */
+    val parameters: List<JvmParam> get() = signature.parameters
+    /** The types of the method's type parameters. */
+    val typeParameters: List<JvmTypeParam> get() = signature.typeParameters
+    /** The types of the method's checked throwables. */
+    val throwableTypes: List<JvmType> get() = signature.throwableTypes
 
     /** Whether this is a static method. This influences the generated instructions used to invoke the method. */
     val isStatic: Boolean get() = modifiers.contains(JvmMethodModifiers.Static)

@@ -1,6 +1,7 @@
 package dev.pelsmaeker.kode
 
 
+import dev.pelsmaeker.kode.types.JvmMethodDecl
 import dev.pelsmaeker.kode.types.JvmMethodRef
 import dev.pelsmaeker.kode.utils.Eponymizer
 import org.objectweb.asm.MethodVisitor
@@ -15,8 +16,10 @@ import org.objectweb.asm.MethodVisitor
 class JvmMethodBuilder internal constructor(
     /** The owning class builder. */
     val classBuilder: JvmClassBuilder,
-    /** The reference to the method being built. */
-    val reference: JvmMethodRef,
+    /** The declaration of the method being built. */
+    val declaration: JvmMethodDecl,
+//    /** The reference to the method being built. */
+//    val reference: JvmMethodRef,
     /** The method visitor. */
     val methodVisitor: MethodVisitor,
     /** The method eponymizer. */
@@ -42,7 +45,7 @@ class JvmMethodBuilder internal constructor(
     fun beginCode(): JvmScopeBuilder {
         checkUsable()
         methodVisitor.visitCode()
-        val jvmScopeBuilder = JvmScopeBuilder(this, eponymizer = eponymizer.scope(reference.name))
+        val jvmScopeBuilder = JvmScopeBuilder(this, eponymizer = eponymizer.scope("(body)"))
         bodyScope = jvmScopeBuilder
         initializeLocalVars(jvmScopeBuilder.localVars)
         return jvmScopeBuilder
@@ -56,16 +59,16 @@ class JvmMethodBuilder internal constructor(
      */
     private fun initializeLocalVars(localVars: JvmLocalVars) {
         // Add `this` reference.
-        if (reference.isInstance) {
+        if (declaration.isInstance) {
             localVars.addThis(classBuilder.declaration.ref() /* FIXME: Not sure this is correct when the type is parameterized. */)
         }
         // Add the arguments in the order they are defined.
-        for (parameter in reference.signature.parameters) {
+        for (parameter in declaration.signature.parameters) {
             localVars.addArgument(parameter)
         }
     }
 
-    @Deprecated("") // Prefer using build()
+    @Deprecated("Prefer using build()") // Prefer using build()
     override fun close() {
         if (closed) return
         checkUsable()
@@ -96,15 +99,14 @@ class JvmMethodBuilder internal constructor(
      *
      * @return the reference to the method
      */
-    fun build(): JvmMethodRef {
+    fun build(): JvmMethodDecl {
         @Suppress("DEPRECATION")
         close()
-        return reference
+        return declaration
     }
 
-    override fun toString(): String {
-        return reference.owner.toString() + "::" + reference.name
-    }
+    override fun toString(): String =
+        "${declaration.owner}::${declaration.debugName}"
 
     /**
      * Checks that the object is usable.

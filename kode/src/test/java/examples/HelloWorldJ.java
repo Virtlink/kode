@@ -31,31 +31,34 @@ public class HelloWorldJ {
 
     @Test
     public void test() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        final JvmModuleBuilder jvmModuleBuilder = new JvmModuleBuilder();
-        final JvmPackageRef pkgRef = new JvmPackageRef("com/example");
-        final JvmClassDecl classDecl = new JvmClassDecl("HelloWorld", pkgRef);
-        final JvmMethodRef methodRef = new JvmMethodRef("main", classDecl.ref(), false,
-            new JvmMethodSignature(JvmVoid.INSTANCE, List.of(new JvmParam(new JvmArray(JvmTypes.INSTANCE.getString().ref()), "args")))
-        );
+        final JvmCompiledClass compiledClass;
+        try (final JvmModuleBuilder moduleBuilder = new JvmModuleBuilder()) {
+            final JvmPackageRef pkgRef = new JvmPackageRef("com/example");
+            final JvmClassDecl classDecl = new JvmClassDecl("HelloWorld", pkgRef);
 
-        // package com.example
-        // public class HelloWorld
-        final JvmClassBuilder classBuilder = jvmModuleBuilder.createClass(classDecl, JvmClassModifiers.Public());
-        try (classBuilder) {
-            // public static void main(String[] args)
-            try (final JvmMethodBuilder methodBuilder = classBuilder.createMethod(methodRef, JvmMethodModifiers.Public() | JvmMethodModifiers.Static())) {
-                try (final JvmScopeBuilder scopeBuilder = methodBuilder.beginCode()) {
-                    // System.out.println("Hello, World!");
-                    final JvmClassRef printStreamType = JvmClassRef.Companion.of(PrintStream.class);
-                    scopeBuilder.getField(new JvmFieldRef("out", JvmTypes.INSTANCE.getSystem().ref(), false, printStreamType));
-                    scopeBuilder.ldc("Hello, World!");
-                    scopeBuilder.invokeMethod(new JvmMethodRef("println", printStreamType, true, new JvmMethodSignature(JvmVoid.INSTANCE, List.of(new JvmParam(JvmTypes.INSTANCE.getString().ref())))));
-                    // return
-                    scopeBuilder.ret();
+            // package com.example
+            // public class HelloWorld
+            final JvmClassBuilder classBuilder = moduleBuilder.createClass(classDecl, JvmClassModifiers.Public());
+            try (classBuilder) {
+                // public static void main(String[] args)
+                try (final JvmMethodBuilder methodBuilder = classBuilder.createMethod(
+                        "main",
+                        JvmMethodModifiers.Public() | JvmMethodModifiers.Static(),
+                        new JvmMethodSignature(JvmVoid.INSTANCE, List.of(new JvmParam(new JvmArray(JvmTypes.INSTANCE.getString().ref()), "args")))
+                )) {
+                    try (final JvmScopeBuilder scopeBuilder = methodBuilder.beginCode()) {
+                        // System.out.println("Hello, World!");
+                        final JvmClassRef printStreamType = JvmClassRef.Companion.of(PrintStream.class);
+                        scopeBuilder.getField(new JvmFieldRef("out", JvmTypes.INSTANCE.getSystem().ref(), false, printStreamType));
+                        scopeBuilder.ldc("Hello, World!");
+                        scopeBuilder.invokeMethod(new JvmMethodRef("println", printStreamType, true, new JvmMethodSignature(JvmVoid.INSTANCE, List.of(new JvmParam(JvmTypes.INSTANCE.getString().ref())))));
+                        // return
+                        scopeBuilder.ret();
+                    }
                 }
             }
+            compiledClass = classBuilder.build();
         }
-        final JvmCompiledClass compiledClass = classBuilder.build();
 
         compiledClass.check();
         final Class<Object> cls = compiledClass.load();

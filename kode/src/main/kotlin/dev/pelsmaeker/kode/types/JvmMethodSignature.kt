@@ -8,12 +8,12 @@ import dev.pelsmaeker.kode.JvmParam
 data class JvmMethodSignature @JvmOverloads constructor(
     /** The type of the method's return value. */
     val returnType: JvmType,
-    /** The method's parameters. */
+    /** The parameters of the method. */
     val parameters: List<JvmParam> = emptyList(),
     /** The types of the method's type parameters. */
     val typeParameters: List<JvmTypeParam> = emptyList(),
     /** The types of the method's checked throwables. */
-    val throwables: List<JvmType> = emptyList(),
+    val throwableTypes: List<JvmType> = emptyList(),
 ) {
 
     /** The arity of the method. */
@@ -36,7 +36,7 @@ data class JvmMethodSignature @JvmOverloads constructor(
         }
         parameters.joinTo(this, prefix = "(", postfix = ")") { it.type.signature }
         append(returnType.signature)
-        throwables.joinTo(this, prefix = "^", separator = "^")
+        throwableTypes.joinTo(this, prefix = "^", separator = "^")
     }.toString()
 
     override fun toString(): String = StringBuilder().apply {
@@ -45,9 +45,9 @@ data class JvmMethodSignature @JvmOverloads constructor(
         }
         parameters.joinTo(this, prefix = "(", postfix = ")") { it.type.signature }
         append(returnType)
-        if (throwables.isNotEmpty()) {
+        if (throwableTypes.isNotEmpty()) {
             append(" throws ")
-            throwables.joinTo(this)
+            throwableTypes.joinTo(this)
         }
     }.toString()
 }

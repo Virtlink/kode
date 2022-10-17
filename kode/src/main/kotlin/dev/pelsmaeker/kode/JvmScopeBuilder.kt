@@ -57,7 +57,7 @@ class JvmScopeBuilder(
 
         // Add the end label
         methodBuilder.methodVisitor.visitLabel(endLabel.internalLabel)
-        
+
         eponymizer.close()
     }
 

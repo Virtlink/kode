@@ -22,29 +22,101 @@ class JvmClassBuilder internal constructor(
 ) : AutoCloseable {
 
     /**
-     * Creates a method with the specified modifiers.
+     * Creates a method.
      *
      * Call [JvmMethodBuilder.beginCode] to start adding instructions to the method's body.
      * Call [JvmMethodBuilder.build] when done with the returned builder.
      *
-     * @param method the method's reference
-     * @param modifiers the method's modifiers
+     * @param declaration the declaration of the method to build
+     * @return a [JvmMethodBuilder]
+     */
+    fun createMethod(
+        declaration: JvmMethodDecl
+    ): JvmMethodBuilder {
+        require(declaration.owner == this.declaration) {
+            "Method is declared in ${declaration.owner}, but the class being built is ${this.declaration}."
+        }
+        val methodVisitor: org.objectweb.asm.MethodVisitor = classWriter.visitMethod(
+            declaration.modifiers.value,
+            declaration.name,
+            declaration.signature.descriptor,
+            null,  //declaration.signature.signature,   // TODO: When to add signature?
+            declaration.signature.throwableTypes.map(JvmType::descriptor).toTypedArray()
+        )
+        return JvmMethodBuilder(this, declaration, methodVisitor, eponymizer.scope(declaration.debugName))
+    }
+
+
+    /**
+     * Creates a method.
+     *
+     * Call [JvmMethodBuilder.beginCode] to start adding instructions to the method's body.
+     * Call [JvmMethodBuilder.build] when done with the returned builder.
+     *
+     * @param name the name of the method; or `null` if it is a constructor
+     * @param modifiers the modifiers of the method
+     * @param signature the signature of the method
      * @return a [JvmMethodBuilder]
      */
     @JvmName("createMethod")
-    fun createMethod(method: JvmMethodRef, modifiers: JvmMethodModifiers): JvmMethodBuilder {
-        require(modifiers.contains(JvmMethodModifiers.Static) == method.isStatic) {
-            if (method.isStatic) "Static method without 'static' modifier." else "Instance method with 'static' modifier."
-        }
-        val methodVisitor: org.objectweb.asm.MethodVisitor = classWriter.visitMethod(
-            modifiers.value,
-            method.name,
-            method.signature.descriptor,
-            null,  //method.signature.signature,   // TODO: When to add signature?
-            method.signature.throwables.map(JvmType::descriptor).toTypedArray()
-        )
-        return JvmMethodBuilder(this, method, methodVisitor, eponymizer.scope(method.name))
-    }
+    fun createMethod(
+        name: String?,
+        modifiers: JvmMethodModifiers,
+        signature: JvmMethodSignature,
+    ): JvmMethodBuilder = createMethod(JvmMethodDecl(name, declaration, modifiers, signature))
+
+    /**
+     * Creates a method.
+     *
+     * Call [JvmMethodBuilder.beginCode] to start adding instructions to the method's body.
+     * Call [JvmMethodBuilder.build] when done with the returned builder.
+     *
+     * @param name the name of the method; or `null` if it is a constructor
+     * @param modifiers the modifiers of the method
+     * @param returnType the return type of the method
+     * @param parameters the parameters of the method
+     * @param typeParameters the type parameters of the method
+     * @param throwableTypes the checked throwable types of the method
+     * @return a [JvmMethodBuilder]
+     */
+    @JvmName("createMethod")
+    fun createMethod(
+        name: String?,
+        modifiers: JvmMethodModifiers,
+        returnType: JvmType,
+        parameters: List<JvmParam> = emptyList(),
+        typeParameters: List<JvmTypeParam> = emptyList(),
+        throwableTypes: List<JvmType> = emptyList(),
+    ): JvmMethodBuilder = createMethod(
+        name,
+        modifiers,
+        JvmMethodSignature(returnType, parameters, typeParameters, throwableTypes)
+    )
+
+//    /**
+//     * Creates a method with the specified modifiers.
+//     *
+//     * Call [JvmMethodBuilder.beginCode] to start adding instructions to the method's body.
+//     * Call [JvmMethodBuilder.build] when done with the returned builder.
+//     *
+//     * @param method the method's reference
+//     * @param modifiers the method's modifiers
+//     * @return a [JvmMethodBuilder]
+//     */
+//    @JvmName("createMethod")
+//    fun createMethod(method: JvmMethodRef, modifiers: JvmMethodModifiers): JvmMethodBuilder {
+//        require(modifiers.contains(JvmMethodModifiers.Static) == method.isStatic) {
+//            if (method.isStatic) "Static method without 'static' modifier." else "Instance method with 'static' modifier."
+//        }
+//        val methodVisitor: org.objectweb.asm.MethodVisitor = classWriter.visitMethod(
+//            modifiers.value,
+//            method.name,
+//            method.signature.descriptor,
+//            null,  //method.signature.signature,   // TODO: When to add signature?
+//            method.signature.throwableTypes.map(JvmType::descriptor).toTypedArray()
+//        )
+//        return JvmMethodBuilder(this, method, methodVisitor, eponymizer.scope(method.name))
+//    }
 
     /**
      * Creates a bridge method, bridging from the specified signature to another signature with the same arity.
@@ -52,33 +124,39 @@ class JvmClassBuilder internal constructor(
      * Bridge methods are used for covariant return types, and when generic type erasure of a method's arguments
      * makes them differ from the actual method being invoked.
      *
-     * @param fromMethod the bridge method
+     * @param declaration the bridge method
      * @param toMethod the bridged method
-     * @param modifiers the method's modifiers (both the bridge method and the bridged method)
-     * @return a reference to the bridge method
+     * @return the bridge method declaration
      */
     private fun createBridgeMethod(
-        fromMethod: JvmMethodRef,
+        declaration: JvmMethodDecl,
         toMethod: JvmMethodRef,
-        modifiers: JvmMethodModifiers,
-    ): JvmMethodRef {
-        require(fromMethod.owner.declaration == declaration) { "Bridge method not in this class." }
-        require(toMethod.owner.declaration == declaration) { "Bridged method not in this class." }
-        require(fromMethod.signature.parameters.size == toMethod.signature.parameters.size) {
-            "Signatures must have the same number of parameters: ${fromMethod.signature} -> ${toMethod.signature}"
+    ): JvmMethodDecl {
+        require(declaration.owner == this.declaration) {
+            "Bridge method is declared in ${declaration.owner}, but the class being built is ${this.declaration}."
         }
-        createMethod(
-            fromMethod,
-            modifiers or JvmMethodModifiers.Bridge or JvmMethodModifiers.Synthetic
-        ).use { methodBuilder ->
+        require(toMethod.owner.declaration == this.declaration) {
+            "Bridged method is declared in ${toMethod.owner.declaration}, but the class being built is ${this.declaration}."
+        }
+        require(declaration.signature.parameters.size == toMethod.signature.parameters.size) {
+            "Signatures must have the same number of parameters: ${declaration.signature} -> ${toMethod.signature}"
+        }
+        require(JvmMethodModifiers.Bridge in declaration.modifiers) {
+            "Bridge method needs the Bridge modifier."
+        }
+        require(JvmMethodModifiers.Synthetic in declaration.modifiers) {
+            "Bridge method needs the Synthetic modifier."
+        }
+        // TODO: Should we make sure the bridge and bridged methods have the same modifiers modulo Bridge and Synthetic?
+        createMethod(declaration).use { methodBuilder ->
             methodBuilder.beginCode().use { body ->
                 // Load a reference to this instance onto the stack.
                 val _this: JvmLocalVar =
-                    body.localVar("this", declaration.ref() /* FIXME: Is this correct for parameterized types? */)
+                    body.localVar("this", this.declaration.ref() /* FIXME: Is this correct for parameterized types? */)
                 body.aLoad(_this)
 
                 // Load each of the incoming arguments onto the stack.
-                val fromSignature: JvmMethodSignature = fromMethod.signature
+                val fromSignature: JvmMethodSignature = declaration.signature
                 val toSignature: JvmMethodSignature = toMethod.signature
                 val paramCount: Int = fromSignature.parameters.size
                 for (i in 0 until paramCount) {
@@ -96,7 +174,7 @@ class JvmClassBuilder internal constructor(
                 body.invokeMethod(toMethod)
                 body.aReturn()
             }
-            return methodBuilder.reference
+            return methodBuilder.build()
         }
     }
 
@@ -109,33 +187,26 @@ class JvmClassBuilder internal constructor(
      * @return a [JvmMethodBuilder]
      */
     fun createStaticConstructor(): JvmMethodBuilder {
-        val method = JvmMethodRef(
+        // FIXME: Is it correct that a static constructor has no modifiers?
+        return createMethod(
             null,
-            declaration.ref() /* FIXME: Is this correct for parameterized types? */,
-            false,
+            JvmMethodModifiers.Static,
             JvmMethodSignature(JvmVoid)
         )
-        val modifiers = JvmMethodModifiers.None
-        return createMethod(method, modifiers)
     }
 
     /**
      * Creates a default parameterless constructor that calls its parent constructor.
      *
      * @param modifiers the constructor's modifiers
+     * @return the constructor declaration
      */
-    fun createDefaultConstructor(modifiers: JvmMethodModifiers) {
-        val method = JvmMethodRef(
-            null,
-            declaration.ref() /* FIXME: Is this correct for parameterized types? */,
-            true,
-            JvmMethodSignature(JvmVoid)
-        )
-        createMethod(method, modifiers).use { constructor ->
-            constructor.beginCode().use { scope ->
-                val _this: JvmLocalVar = scope.localVars.`this`
-                scope.aLoad(_this)
-                scope.invokeMethod(
+    fun createDefaultConstructor(modifiers: JvmMethodModifiers): JvmMethodDecl {
+        return createConstructor(modifiers, emptyList()).apply {
+            beginCode().apply {
+                val `this`: JvmLocalVar = localVars.`this`
+                aLoad(`this`)
+                invokeMethod(
                     JvmMethodRef(
                         null,
                         JvmTypes.Object.ref(),
@@ -143,23 +214,27 @@ class JvmClassBuilder internal constructor(
                         JvmMethodSignature(JvmVoid)
                     )
                 )
-                scope.ret()
+                ret()
             }
-        }
+        }.build()
     }
 
     /**
-     * Creates a lambda.
+     * Creates a constructor.
      *
-     * Call [JvmMethodBuilder.beginCode] to start adding instructions to the method's body.
-     * Call [JvmMethodBuilder.close] when done with the method.
-     *
-     * @param nameHint the lambda's name hint
-     * @param signature the lambda's signature
+     * @param modifiers the constructor's modifiers
+     * @param parameters the constructor's parameters
      * @return a [JvmMethodBuilder]
      */
-    fun createLambda(nameHint: String, signature: JvmMethodSignature): JvmMethodBuilder {
-        return createLambda(nameHint, signature, emptyList())
+    fun createConstructor(modifiers: JvmMethodModifiers, parameters: List<JvmParam>): JvmMethodBuilder {
+        require(JvmMethodModifiers.Static !in modifiers) {
+            "Instance constructor must not have Static modifier."
+        }
+        return createMethod(
+            null,
+            modifiers,
+            JvmMethodSignature(JvmVoid, parameters)
+        )
     }
 
     /**
@@ -176,7 +251,7 @@ class JvmClassBuilder internal constructor(
     fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar>,
+        capturedVars: List<JvmLocalVar> = emptyList(),
     ): JvmMethodBuilder {
         return createLambda(nameHint, signature, capturedVars, emptyArray())
     }
@@ -196,7 +271,7 @@ class JvmClassBuilder internal constructor(
     fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar>,
+        capturedVars: List<JvmLocalVar> = emptyList(),
         thrownExceptionType: JvmType,
     ): JvmMethodBuilder {
         return createLambda(nameHint, signature, capturedVars, arrayOf(thrownExceptionType.descriptor))
@@ -217,8 +292,8 @@ class JvmClassBuilder internal constructor(
     fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar>,
-        thrownExceptionTypes: List<JvmType>,
+        capturedVars: List<JvmLocalVar> = emptyList(),
+        thrownExceptionTypes: List<JvmType> = emptyList(),
     ): JvmMethodBuilder {
         return createLambda(
             nameHint,
@@ -243,22 +318,14 @@ class JvmClassBuilder internal constructor(
     private fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar>,
-        thrownExceptionTypeDescriptors: Array<String>,
+        capturedVars: List<JvmLocalVar> = emptyList(),
+        thrownExceptionTypeDescriptors: Array<String> = emptyArray(),
     ): JvmMethodBuilder {
-        val lambdaName = getFreshLambdaName(nameHint)
-        val lambdaSignature: JvmMethodSignature = getLambdaSignature(signature, capturedVars)
-        val method = JvmMethodRef(
-            lambdaName,
-            declaration.ref() /* FIXME: Is this correct for parameterized types? */,
-            false,
-            lambdaSignature
-        )
+        // TODO: Do something with the thrown exception types
         return createMethod(
-            method,
-            JvmMethodModifiers.Private or
-            JvmMethodModifiers.Static or
-            JvmMethodModifiers.Synthetic,
+            getFreshLambdaName(nameHint),
+            JvmMethodModifiers.Private or JvmMethodModifiers.Static or JvmMethodModifiers.Synthetic,
+            getLambdaSignature(signature, capturedVars),
         )
     }
 
@@ -283,7 +350,7 @@ class JvmClassBuilder internal constructor(
      * @param field the field's definition
      * @param modifiers the field's modifiers
      * @param value the field's value, which may be `null`
-     * @return the field builder
+     * @return a [JvmFieldBuilder]
      */
     fun createField(field: JvmFieldRef, modifiers: JvmFieldModifiers, value: Any?): JvmFieldBuilder {
         require(
