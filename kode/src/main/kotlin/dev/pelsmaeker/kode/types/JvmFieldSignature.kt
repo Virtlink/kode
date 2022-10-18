@@ -7,7 +7,6 @@ data class JvmFieldSignature(
     /** The type of the field's value. */
     val type: JvmType
 ) {
-
     /** The field's JVM descriptor. */
     val descriptor: String get() = type.descriptor
 

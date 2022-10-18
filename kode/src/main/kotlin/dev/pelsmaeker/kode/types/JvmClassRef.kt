@@ -22,8 +22,8 @@ data class JvmClassRef internal constructor(
 ): JvmType, JvmRef {
 
     init {
-        require(typeArguments.size == declaration.typeParameters.size) {
-            "Expected ${declaration.typeParameters.size} type arguments, got ${typeArguments.size}: ${typeArguments.joinToString()}"
+        require(typeArguments.size == declaration.signature.typeParameters.size) {
+            "Expected ${declaration.signature.typeParameters.size} type arguments, got ${typeArguments.size}: ${typeArguments.joinToString()}"
         }
         require(declaration.enclosingClass != null == (enclosingClassRef != null)) {
             "The declaring $declaration has ${if (declaration.enclosingClass != null) "an enclosing ${declaration.enclosingClass}" else "no enclosing class"}, " +

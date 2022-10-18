@@ -1,5 +1,6 @@
 package dev.pelsmaeker.kode.types
 
+import dev.pelsmaeker.kode.JvmClassSignature
 import dev.pelsmaeker.kode.types.JvmPackageRef.Companion.ref
 import java.lang.reflect.Modifier
 import java.nio.file.Path
@@ -17,8 +18,8 @@ data class JvmClassDecl @JvmOverloads constructor(
     val pkg: JvmPackageRef,
     /** Whether this is an interface. This influences the generated instructions used to invoke members of this class. */
     val isInterface: Boolean = false,
-    /** The type parameters of this class. */
-    val typeParameters: List<JvmTypeParam> = emptyList(),
+    /** The class signature. */
+    val signature: JvmClassSignature,
     /** The enclosing class of this inner class; or `null` if this is not an inner class. */
     val enclosingClass: JvmClassDecl? = null,
 ) {
@@ -26,24 +27,10 @@ data class JvmClassDecl @JvmOverloads constructor(
     // Store the reference of the plain type.
     private val reference: JvmClassRef = JvmClassRef(
         this,
-        typeParameters.map { it: JvmTypeParam -> JvmTypeArg(it.name) },
+        signature.typeParameters.map { it: JvmTypeParam -> JvmTypeArg(it.name) },
         JvmNullability.Maybe,
         enclosingClass?.ref()
     )
-
-    constructor(
-        name: String,
-        pkg: JvmPackageRef,
-        isInterface: Boolean = false,
-        vararg typeParameters: JvmTypeParam,
-    ) : this(name, pkg, isInterface, typeParameters.toList(), null)
-
-    constructor(
-        name: String,
-        pkg: JvmPackageRef,
-        isInterface: Boolean = false,
-        vararg typeParameterNames: String,
-    ) : this(name, pkg, isInterface, typeParameterNames.map { JvmTypeParam(name) }, null)
 
     /** Whether this is a class. This influences the generated instructions used to invoke members of this class. */
     val isClass: Boolean get() = !isInterface
@@ -127,8 +114,8 @@ data class JvmClassDecl @JvmOverloads constructor(
         nullability: JvmNullability = JvmNullability.Maybe,
         enclosingClassRef: JvmClassRef? = enclosingClass?.ref(),
     ): JvmClassRef {
-        require(typeArguments.size == typeParameters.size) {
-            "Expected ${typeParameters.size} type arguments, got ${typeArguments.size}: ${typeArguments.joinToString()}"
+        require(typeArguments.size == signature.typeParameters.size) {
+            "Expected ${signature.typeParameters.size} type arguments, got ${typeArguments.size}: ${typeArguments.joinToString()}"
         }
         require(enclosingClass != null == (enclosingClassRef != null)) {
             "The declaring $this has ${if (enclosingClass != null) "an enclosing $enclosingClass" else "no enclosing class"}, " +
@@ -144,7 +131,6 @@ data class JvmClassDecl @JvmOverloads constructor(
         } else {
             append(javaName)
         }
-        if (typeParameters.isNotEmpty()) typeParameters.joinTo(this, prefix = "<", postfix = ">")
     }.toString()
 
     companion object {
@@ -190,7 +176,8 @@ data class JvmClassDecl @JvmOverloads constructor(
                 className,
                 pkg,
                 isInterface,
-                typeParams,
+                // TODO: Super class and super interfaces
+                JvmClassSignature(typeParameters = typeParams),
                 enclosingClass
             )
         }

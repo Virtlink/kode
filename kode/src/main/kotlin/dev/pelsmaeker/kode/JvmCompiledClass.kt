@@ -222,7 +222,9 @@ class JvmCompiledClass(
 
             // TODO: SuperClass, SuperInterfaces, TypeParameters
             // FIXME: This replacement might not work correctly on Windows
-            val type = JvmClassDecl(className, JvmPackageDecl(packageName.replace('/', '.')).ref(), isInterface)
+            val type = JvmClassDecl(className, JvmPackageDecl(packageName.replace('/', '.')).ref(), isInterface,
+                JvmClassSignature()
+            )
             return JvmCompiledClass(type, bytes)
         }
     }

@@ -18,7 +18,7 @@ class JvmClassDeclTests {
         assertEquals("java/lang", classDecl.pkg.internalName)
         assertEquals("java/lang/Void", classDecl.internalName)
         assertEquals("java.lang.Void", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -35,7 +35,7 @@ class JvmClassDeclTests {
         assertEquals("dev/pelsmaeker/kode/types", classDecl.pkg.internalName)
         assertEquals("dev/pelsmaeker/kode/types/C", classDecl.internalName)
         assertEquals("dev.pelsmaeker.kode.types.C", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -52,7 +52,7 @@ class JvmClassDeclTests {
         assertEquals("dev/pelsmaeker/kode/types", classDecl.pkg.internalName)
         assertEquals("dev/pelsmaeker/kode/types/C\$CIC", classDecl.internalName)
         assertEquals("dev.pelsmaeker.kode.types.C\$CIC", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertEquals(JvmClassDecl.of(C::class.java), classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -69,7 +69,7 @@ class JvmClassDeclTests {
         assertEquals("dev/pelsmaeker/kode/types", classDecl.pkg.internalName)
         assertEquals("dev/pelsmaeker/kode/types/C\$CNC", classDecl.internalName)
         assertEquals("dev.pelsmaeker.kode.types.C\$CNC", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -86,7 +86,7 @@ class JvmClassDeclTests {
         assertEquals("dev/pelsmaeker/kode/types", classDecl.pkg.internalName)
         assertEquals("dev/pelsmaeker/kode/types/C\$CNI", classDecl.internalName)
         assertEquals("dev.pelsmaeker.kode.types.C\$CNI", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertTrue(classDecl.isInterface)
         assertFalse(classDecl.isClass)
@@ -103,7 +103,7 @@ class JvmClassDeclTests {
         assertEquals("dev/pelsmaeker/kode/types", classDecl.pkg.internalName)
         assertEquals("dev/pelsmaeker/kode/types/I", classDecl.internalName)
         assertEquals("dev.pelsmaeker.kode.types.I", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertTrue(classDecl.isInterface)
         assertFalse(classDecl.isClass)
@@ -120,7 +120,7 @@ class JvmClassDeclTests {
         assertEquals("dev/pelsmaeker/kode/types", classDecl.pkg.internalName)
         assertEquals("dev/pelsmaeker/kode/types/I\$INC", classDecl.internalName)
         assertEquals("dev.pelsmaeker.kode.types.I\$INC", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -137,7 +137,7 @@ class JvmClassDeclTests {
         assertEquals("dev/pelsmaeker/kode/types", classDecl.pkg.internalName)
         assertEquals("dev/pelsmaeker/kode/types/I\$INI", classDecl.internalName)
         assertEquals("dev.pelsmaeker.kode.types.I\$INI", classDecl.javaName)
-        assertEquals(emptyList<JvmTypeParam>(), classDecl.typeParameters)
+        assertEquals(emptyList<JvmTypeParam>(), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertTrue(classDecl.isInterface)
         assertFalse(classDecl.isClass)
@@ -156,7 +156,7 @@ class JvmClassDeclTests {
         assertEquals("dev.pelsmaeker.kode.types.GC", classDecl.javaName)
         assertEquals(listOf(
             JvmTypeParam("T", JvmTypes.Object.ref()),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -176,7 +176,7 @@ class JvmClassDeclTests {
         assertEquals(listOf(
             JvmTypeParam("T", JvmTypes.Object.ref()),
             JvmTypeParam("U", JvmTypes.Object.ref()),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertEquals(JvmClassDecl.of(GC::class.java), classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -196,7 +196,7 @@ class JvmClassDeclTests {
         assertEquals(listOf(
             JvmTypeParam("T", JvmTypes.Object.ref()),
             JvmTypeParam("U", JvmTypes.Object.ref()),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -216,7 +216,7 @@ class JvmClassDeclTests {
         assertEquals(listOf(
             JvmTypeParam("T", JvmTypes.Object.ref()),
             JvmTypeParam("U", JvmTypes.Object.ref()),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertTrue(classDecl.isInterface)
         assertFalse(classDecl.isClass)
@@ -235,7 +235,7 @@ class JvmClassDeclTests {
         assertEquals("dev.pelsmaeker.kode.types.GI", classDecl.javaName)
         assertEquals(listOf(
             JvmTypeParam("T", JvmTypes.Object.ref()),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertTrue(classDecl.isInterface)
         assertFalse(classDecl.isClass)
@@ -255,7 +255,7 @@ class JvmClassDeclTests {
         assertEquals(listOf(
             JvmTypeParam("T", JvmTypes.Object.ref()),
             JvmTypeParam("U", JvmTypes.Object.ref()),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)
@@ -275,7 +275,7 @@ class JvmClassDeclTests {
         assertEquals(listOf(
             JvmTypeParam("T", JvmTypes.Object.ref()),
             JvmTypeParam("U", JvmTypes.Object.ref()),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertTrue(classDecl.isInterface)
         assertFalse(classDecl.isClass)
@@ -308,7 +308,7 @@ class JvmClassDeclTests {
             JvmTypeParam("W", null, listOf(gc_gcni.ref(JvmTypeArg(c.ref()), JvmTypeArg("U")))),
             JvmTypeParam("X", c.ref(), listOf(i.ref())),
             JvmTypeParam("Y", c.ref(), listOf(i.ref())),
-        ), classDecl.typeParameters)
+        ), classDecl.signature.typeParameters)
         assertNull(classDecl.enclosingClass)
         assertFalse(classDecl.isInterface)
         assertTrue(classDecl.isClass)

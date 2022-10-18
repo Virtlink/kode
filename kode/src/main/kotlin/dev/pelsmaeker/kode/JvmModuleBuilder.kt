@@ -3,6 +3,7 @@ package dev.pelsmaeker.kode
 
 import dev.pelsmaeker.kode.types.JvmClassDecl
 import dev.pelsmaeker.kode.types.JvmRef
+import dev.pelsmaeker.kode.types.JvmTypes
 import dev.pelsmaeker.kode.utils.Eponymizer
 import org.objectweb.asm.ClassWriter
 import java.util.regex.Pattern
@@ -42,14 +43,14 @@ class JvmModuleBuilder(
         var classFlags = 0
         if (computeMaxs) classFlags = classFlags or ClassWriter.COMPUTE_MAXS
         if (computeFrames) classFlags = classFlags or ClassWriter.COMPUTE_FRAMES
-        val superClassInternalName = signature.superClass.internalName
+        val superClassInternalName = (signature.superClass ?: JvmTypes.Object.ref()).internalName
         val superInterfacesInternalNames = signature.superInterfaces.map(JvmRef::internalName).toTypedArray()
         val classWriter = ClassWriter(classFlags)
         classWriter.visit(
             classVersion.value,
             modifiers.value,
             declaration.internalName,
-            signature.getSignature(declaration.typeParameters),
+            signature.signature,
             superClassInternalName,
             superInterfacesInternalNames
         )

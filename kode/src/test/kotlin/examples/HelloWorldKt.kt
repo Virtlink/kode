@@ -15,7 +15,7 @@ class HelloWorldKt {
         val compiledClass: JvmCompiledClass
         JvmModuleBuilder().apply {
             val pkgRef = JvmPackageDecl("com.example").ref()
-            val classDecl = JvmClassDecl("HelloWorld", pkgRef)
+            val classDecl = JvmClassDecl("HelloWorld", pkgRef, signature = JvmClassSignature())
 
             // package com.example
             // public class HelloWorld
@@ -23,8 +23,8 @@ class HelloWorldKt {
                 // public static void main(String[] args)
                 createMethod(
                     "main",
+                    JvmMethodSignature(JvmVoid, listOf(JvmParam(JvmArray(JvmTypes.String.ref()), "args"))),
                     JvmMethodModifiers.Public or JvmMethodModifiers.Static,
-                    JvmMethodSignature(JvmVoid, listOf(JvmParam(JvmArray(JvmTypes.String.ref()), "args")))
                 ).apply {
                     beginCode().apply {
                         // System.out.println("Hello, World!")
@@ -33,12 +33,12 @@ class HelloWorldKt {
                         getField(JvmFieldDecl("out", JvmTypes.System, printStreamType, false).ref(JvmTypes.System.ref()))
                         ldc("Hello, World!")
                         invokeMethod(
-                            JvmMethodRef(
+                            JvmMethodDecl(
                                 "println",
-                                printStreamType,
-                                true,
-                                JvmMethodSignature(JvmVoid, listOf(JvmParam(JvmTypes.String.ref())))
-                            )
+                                printStreamType.declaration,
+                                JvmMethodSignature(JvmVoid, listOf(JvmParam(JvmTypes.String.ref()))),
+                                JvmMethodModifiers.None,
+                            ).ref(printStreamType)
                         )
                         // return
                         ret()

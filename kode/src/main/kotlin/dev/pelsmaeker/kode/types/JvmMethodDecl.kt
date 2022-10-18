@@ -11,10 +11,10 @@ class JvmMethodDecl(
     val name: String?,
     /** The class that declares this method. */
     val owner: JvmClassDecl,
-    /** The modifiers of the method. */
-    val modifiers: JvmMethodModifiers,
     /** The signature of the method. */
     val signature: JvmMethodSignature,
+    /** The modifiers of the method. */
+    val modifiers: JvmMethodModifiers,
 ) {
 
     /** The debug name of the method, which is the name of the method or a special identifier if it's a constructor. */
@@ -41,8 +41,8 @@ class JvmMethodDecl(
      *
      * @return the reference to the instantiated method
      */
-    fun ref(): JvmMethodRef {
-        return ref(emptyList())
+    fun ref(owner: JvmClassRef): JvmMethodRef {
+        return ref(owner, emptyList())
     }
 
     /**
@@ -52,8 +52,8 @@ class JvmMethodDecl(
      * @param typeArgumentTypes the type argument types
      * @return the reference to the instantiated method
      */
-    fun ref(vararg typeArgumentTypes: JvmType): JvmMethodRef {
-        return ref(typeArgumentTypes.map { JvmTypeArg(it, JvmTypeArgSort.Invariant) })
+    fun ref(owner: JvmClassRef, vararg typeArgumentTypes: JvmType): JvmMethodRef {
+        return ref(owner, typeArgumentTypes.map { JvmTypeArg(it, JvmTypeArgSort.Invariant) })
     }
 
     /**
@@ -63,8 +63,8 @@ class JvmMethodDecl(
      * @param typeArguments the type arguments
      * @return the reference to the instantiated method
      */
-    fun ref(vararg typeArguments: JvmTypeArg): JvmMethodRef {
-        return ref(typeArguments.toList())
+    fun ref(owner: JvmClassRef, vararg typeArguments: JvmTypeArg): JvmMethodRef {
+        return ref(owner, typeArguments.toList())
     }
 
     /**
@@ -74,9 +74,9 @@ class JvmMethodDecl(
      * @param typeArguments the list of type arguments
      * @return the reference to the instantiated method
      */
-    fun ref(typeArguments: List<JvmTypeArg>): JvmMethodRef {
+    fun ref(owner: JvmClassRef, typeArguments: List<JvmTypeArg>): JvmMethodRef {
         require(typeArguments.size == typeParameters.size) { "Expected ${typeParameters.size} type arguments, got ${typeArguments.size}: ${typeArguments.joinToString()}" }
-        TODO()
+        return JvmMethodRef(this, owner)
     }
 
     override fun toString(): String = StringBuilder().apply {

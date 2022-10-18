@@ -54,16 +54,16 @@ class JvmClassBuilder internal constructor(
      * Call [JvmMethodBuilder.build] when done with the returned builder.
      *
      * @param name the name of the method; or `null` if it is a constructor
-     * @param modifiers the modifiers of the method
      * @param signature the signature of the method
+     * @param modifiers the modifiers of the method
      * @return a [JvmMethodBuilder]
      */
     @JvmName("createMethod")
     fun createMethod(
         name: String?,
-        modifiers: JvmMethodModifiers,
         signature: JvmMethodSignature,
-    ): JvmMethodBuilder = createMethod(JvmMethodDecl(name, declaration, modifiers, signature))
+        modifiers: JvmMethodModifiers,
+    ): JvmMethodBuilder = createMethod(JvmMethodDecl(name, declaration, signature, modifiers))
 
     /**
      * Creates a method.
@@ -82,15 +82,15 @@ class JvmClassBuilder internal constructor(
     @JvmName("createMethod")
     fun createMethod(
         name: String?,
-        modifiers: JvmMethodModifiers,
         returnType: JvmType,
         parameters: List<JvmParam> = emptyList(),
         typeParameters: List<JvmTypeParam> = emptyList(),
         throwableTypes: List<JvmType> = emptyList(),
+        modifiers: JvmMethodModifiers,
     ): JvmMethodBuilder = createMethod(
         name,
+        JvmMethodSignature(returnType, parameters, typeParameters, throwableTypes),
         modifiers,
-        JvmMethodSignature(returnType, parameters, typeParameters, throwableTypes)
     )
 
     /**
@@ -165,8 +165,8 @@ class JvmClassBuilder internal constructor(
         // FIXME: Is it correct that a static constructor has no modifiers?
         return createMethod(
             null,
+            JvmMethodSignature(JvmVoid),
             JvmMethodModifiers.Static,
-            JvmMethodSignature(JvmVoid)
         )
     }
 
@@ -177,17 +177,22 @@ class JvmClassBuilder internal constructor(
      * @return the constructor declaration
      */
     fun createDefaultConstructor(modifiers: JvmMethodModifiers): JvmMethodDecl {
+        require(JvmMethodModifiers.Static !in modifiers) {
+            "Instance constructor must not have Static modifier."
+        }
         return createConstructor(modifiers, emptyList()).apply {
             beginCode().apply {
                 val `this`: JvmLocalVar = localVars.`this`
                 aLoad(`this`)
+                // This invokes the Object constructor
+                // FIXME: This should invoke the super constructor?
                 invokeMethod(
-                    JvmMethodRef(
+                    JvmMethodDecl(
                         null,
-                        JvmTypes.Object.ref(),
-                        true,
-                        JvmMethodSignature(JvmVoid)
-                    )
+                        JvmTypes.Object,
+                        JvmMethodSignature(JvmVoid),
+                        modifiers,
+                    ).ref(JvmTypes.Object.ref())
                 )
                 ret()
             }
@@ -207,8 +212,8 @@ class JvmClassBuilder internal constructor(
         }
         return createMethod(
             null,
+            JvmMethodSignature(JvmVoid, parameters),
             modifiers,
-            JvmMethodSignature(JvmVoid, parameters)
         )
     }
 
@@ -299,8 +304,8 @@ class JvmClassBuilder internal constructor(
         // TODO: Do something with the thrown exception types
         return createMethod(
             getFreshLambdaName(nameHint),
-            JvmMethodModifiers.Private or JvmMethodModifiers.Static or JvmMethodModifiers.Synthetic,
             getLambdaSignature(signature, capturedVars),
+            JvmMethodModifiers.Private or JvmMethodModifiers.Static or JvmMethodModifiers.Synthetic,
         )
     }
 

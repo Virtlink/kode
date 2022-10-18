@@ -714,7 +714,7 @@ class JvmScopeBuilder(
      * @param signature the signature of the constructor to be called
      */
     fun invokeConstructor(owner: JvmClassRef, signature: JvmMethodSignature) {
-        invokeMethod(JvmMethodRef(null, owner, true, signature))
+        invokeMethod(JvmMethodDecl(null, owner.declaration, signature, JvmMethodModifiers.None).ref(owner))
     }
 
     /**
