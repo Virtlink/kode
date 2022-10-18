@@ -180,7 +180,7 @@ class JvmClassBuilder internal constructor(
         require(JvmMethodModifiers.Static !in modifiers) {
             "Instance constructor must not have Static modifier."
         }
-        return createConstructor(modifiers, emptyList()).apply {
+        return createConstructor(emptyList(), modifiers).apply {
             beginCode().apply {
                 val `this`: JvmLocalVar = localVars.`this`
                 aLoad(`this`)
@@ -202,11 +202,11 @@ class JvmClassBuilder internal constructor(
     /**
      * Creates a constructor.
      *
-     * @param modifiers the constructor's modifiers
      * @param parameters the constructor's parameters
+     * @param modifiers the constructor's modifiers
      * @return a [JvmMethodBuilder]
      */
-    fun createConstructor(modifiers: JvmMethodModifiers, parameters: List<JvmParam>): JvmMethodBuilder {
+    fun createConstructor(parameters: List<JvmParam>, modifiers: JvmMethodModifiers): JvmMethodBuilder {
         require(JvmMethodModifiers.Static !in modifiers) {
             "Instance constructor must not have Static modifier."
         }
