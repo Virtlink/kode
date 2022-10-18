@@ -2,6 +2,7 @@ package dev.pelsmaeker.kode
 
 
 import dev.pelsmaeker.kode.types.JvmClassDecl
+import dev.pelsmaeker.kode.types.JvmPackageDecl
 import dev.pelsmaeker.kode.types.JvmPackageRef
 import org.objectweb.asm.util.CheckClassAdapter
 import org.objectweb.asm.util.TraceClassVisitor
@@ -220,7 +221,8 @@ class JvmCompiledClass(
             val isInterface = classReader.access and Opcodes.ACC_INTERFACE != 0
 
             // TODO: SuperClass, SuperInterfaces, TypeParameters
-            val type = JvmClassDecl(className, JvmPackageRef(packageName), isInterface)
+            // FIXME: This replacement might not work correctly on Windows
+            val type = JvmClassDecl(className, JvmPackageDecl(packageName.replace('/', '.')).ref(), isInterface)
             return JvmCompiledClass(type, bytes)
         }
     }

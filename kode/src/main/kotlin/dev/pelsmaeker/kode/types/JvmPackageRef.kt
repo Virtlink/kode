@@ -1,29 +1,40 @@
 package dev.pelsmaeker.kode.types
 
-import java.nio.file.Path
-
 /**
  * A JVM package reference.
  *
- * Use [of] to create an instance of this class from a [Package].
+ * Use [ref] to create an instance of this class from a [Package].
  */
-data class JvmPackageRef(
-    /** The internal name of the package. */
-    override val internalName: String
+class JvmPackageRef internal constructor(
+    /** The package declaration. */
+    val declaration: JvmPackageDecl,
 ) : JvmRef {
 
-    /** Whether the package name is empty. */
-    val isEmpty: Boolean get() = internalName.isEmpty()
-    override val javaName: String get() = internalName.replace('/', '.')
+    override val name: String get() = declaration.name
+    override val debugName: String get() = declaration.debugName
+    override val javaName: String get() = declaration.javaName
+    override val internalName: String get() = declaration.internalName
 
-    /**
-     * Resolves this reference in the specified path.
-     *
-     * @param rootPath the root path to resolve in
-     * @return the path to the package directory
-     */
-    fun resolveInPath(rootPath: Path): Path {
-        return rootPath.resolve(internalName)
+    /** Whether the package name is empty. */
+    val isEmpty: Boolean get() = declaration.isEmpty
+
+    // Destructuring declarations
+    operator fun component1() = name
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        val that = other as JvmPackageRef
+        // @formatter:off
+        return this.declaration == that.declaration
+        // @formatter:on
+    }
+
+    override fun hashCode(): Int {
+        var result = 17
+        result = 31 * result + declaration.hashCode()
+        return result
     }
 
     override fun toString(): String {
@@ -32,15 +43,14 @@ data class JvmPackageRef(
 
     companion object {
         /**
-         * Gets the JVM type of the specified package.
-         *
-         * @param pkg the package; or `null` if it's the unnamed package
+         * Gets the JVM type of the specified Java Reflection package
+         * (or `null` if it's the unnamed package).
          * @return the JVM package reference
          */
-        fun of(pkg: Package?): JvmPackageRef {
-            if (pkg == null) return JvmPackageRef("")
-            val packageName = pkg.name.replace('.', '/')
-            return JvmPackageRef(packageName)
+        fun Package?.ref(): JvmPackageRef {
+            // TODO: Can we cache this?
+            val decl = JvmPackageDecl(this?.name ?: "")
+            return decl.ref()
         }
     }
 }

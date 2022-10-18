@@ -1,5 +1,6 @@
 package dev.pelsmaeker.kode.types
 
+import dev.pelsmaeker.kode.types.JvmPackageRef.Companion.ref
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
@@ -14,7 +15,7 @@ class JvmPackageRefTests {
         val pkg = this::class.java.classLoader.getDefinedPackage("dev.pelsmaeker.kode.types")
 
         // Act
-        val ref = JvmPackageRef.of(pkg)
+        val ref = pkg.ref()
 
         // Assert
         assertEquals("dev/pelsmaeker/kode/types", ref.internalName)
@@ -22,14 +23,15 @@ class JvmPackageRefTests {
         assertFalse(ref.isEmpty)
     }
 
+    // TODO: Move this to JvmPackageDeclTests
     @Test
     fun `resolveInPath() should resolve the package to a directory in the given path`() {
         // Arrange
         val rootPath = Paths.get("some/path")
-        val pkgRef = JvmPackageRef("dev/pelsmaeker/kode/types")
+        val pkgDecl = JvmPackageDecl("dev.pelsmaeker.kode.types")
 
         // Act
-        val path = pkgRef.resolveInPath(rootPath)
+        val path = pkgDecl.resolveInPath(rootPath)
 
         // Assert
         assertEquals(rootPath.resolve("dev/pelsmaeker/kode/types"), path)

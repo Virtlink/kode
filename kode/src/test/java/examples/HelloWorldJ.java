@@ -11,9 +11,11 @@ import dev.pelsmaeker.kode.JvmScopeBuilder;
 import dev.pelsmaeker.kode.types.JvmArray;
 import dev.pelsmaeker.kode.types.JvmClassDecl;
 import dev.pelsmaeker.kode.types.JvmClassRef;
+import dev.pelsmaeker.kode.types.JvmFieldDecl;
 import dev.pelsmaeker.kode.types.JvmFieldRef;
 import dev.pelsmaeker.kode.types.JvmMethodRef;
 import dev.pelsmaeker.kode.types.JvmMethodSignature;
+import dev.pelsmaeker.kode.types.JvmPackageDecl;
 import dev.pelsmaeker.kode.types.JvmPackageRef;
 import dev.pelsmaeker.kode.types.JvmTypes;
 import dev.pelsmaeker.kode.types.JvmVoid;
@@ -33,7 +35,7 @@ public class HelloWorldJ {
     public void test() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final JvmCompiledClass compiledClass;
         try (final JvmModuleBuilder moduleBuilder = new JvmModuleBuilder()) {
-            final JvmPackageRef pkgRef = new JvmPackageRef("com/example");
+            final JvmPackageRef pkgRef = new JvmPackageDecl("com.example").ref();
             final JvmClassDecl classDecl = new JvmClassDecl("HelloWorld", pkgRef);
 
             // package com.example
@@ -49,7 +51,8 @@ public class HelloWorldJ {
                     try (final JvmScopeBuilder scopeBuilder = methodBuilder.beginCode()) {
                         // System.out.println("Hello, World!");
                         final JvmClassRef printStreamType = JvmClassRef.Companion.of(PrintStream.class);
-                        scopeBuilder.getField(new JvmFieldRef("out", JvmTypes.INSTANCE.getSystem().ref(), false, printStreamType));
+                        // TODO: Simplify this new JvmFieldDecl.ref() business to just new JvmFieldRef() or something else
+                        scopeBuilder.getField(new JvmFieldDecl("out", JvmTypes.INSTANCE.getSystem(), printStreamType, false).ref(JvmTypes.INSTANCE.getSystem().ref()));
                         scopeBuilder.ldc("Hello, World!");
                         scopeBuilder.invokeMethod(new JvmMethodRef("println", printStreamType, true, new JvmMethodSignature(JvmVoid.INSTANCE, List.of(new JvmParam(JvmTypes.INSTANCE.getString().ref())))));
                         // return

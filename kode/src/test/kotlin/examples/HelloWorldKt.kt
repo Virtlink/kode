@@ -14,7 +14,7 @@ class HelloWorldKt {
     fun test() {
         val compiledClass: JvmCompiledClass
         JvmModuleBuilder().apply {
-            val pkgRef = JvmPackageRef("com/example")
+            val pkgRef = JvmPackageDecl("com.example").ref()
             val classDecl = JvmClassDecl("HelloWorld", pkgRef)
 
             // package com.example
@@ -29,7 +29,8 @@ class HelloWorldKt {
                     beginCode().apply {
                         // System.out.println("Hello, World!")
                         val printStreamType = JvmClassRef.of(PrintStream::class.java)
-                        getField(JvmFieldRef("out", JvmTypes.System.ref(), false, printStreamType))
+                        // TODO: Simplify this JvmFieldDecl.ref() business to just JvmFieldRef() or something else
+                        getField(JvmFieldDecl("out", JvmTypes.System, printStreamType, false).ref(JvmTypes.System.ref()))
                         ldc("Hello, World!")
                         invokeMethod(
                             JvmMethodRef(

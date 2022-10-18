@@ -17,6 +17,7 @@ data class JvmClassRef internal constructor(
     /** The nullability of the type. */
     val nullability: JvmNullability,
     /** The enclosing class reference, if any; otherwise, `null`. */
+    // Owner?
     val enclosingClassRef: JvmClassRef?,
 ): JvmType, JvmRef {
 
@@ -29,7 +30,9 @@ data class JvmClassRef internal constructor(
                     "but ${if (enclosingClassRef != null) "an enclosing $enclosingClassRef" else "no enclosing class"} reference was provided."
         }
     }
-    
+
+    override val name: String get() = declaration.name
+    override val debugName: String get() = name
     override val internalName: String get() = declaration.internalName
     override val javaName: String get() = declaration.javaName
     override val sort: JvmTypeSort get() = JvmTypeSort.Class

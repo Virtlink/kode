@@ -11,15 +11,15 @@ import java.lang.reflect.*
  * and to invoke static and instance methods.
  */
 interface JvmRef {
+
+    /** The name; or `null` if the name is not specified. */
+    val name: String?
+
     /**
-     * The fully-qualified internal name.
-     *
-     * Package names are separated with forward slash (`/`).
-     * Class names are separated with dot (`.`) for inner classes
-     * and dollar sign (`$`) for static nested classes.
-     * Member names are separated with hash (`#`) from the class.
+     * The debug name, which is either the name,
+     * or a special name if an actual name is not specified.
      */
-    val internalName: String
+    val debugName: String
 
     /**
      * The fully-qualified Java name.
@@ -30,4 +30,14 @@ interface JvmRef {
      * Internal member names are separated with hash (`#`) from the class.
      */
     val javaName: String
+
+    /**
+     * The fully-qualified internal name.
+     *
+     * Package names are separated with forward slash (`/`).
+     * Class names are separated with dot (`.`) for inner classes
+     * and dollar sign (`$`) for static nested classes.
+     * Member names are separated with hash (`#`) from the class.
+     */
+    val internalName: String
 }

@@ -14,8 +14,9 @@ import java.util.*
  */
 // TODO: Try to make this a `data class` and remove the equals and hashcode overrides
 class JvmMethodRef(
+    // TODO: Back with JvmMethodDecl
     /** The name of the method; or `null` when it is a static or instance constructor. */
-    name: String?,
+    override val name: String?,
     /** The owner of the method. */
     override val owner: JvmClassRef,
     /** Whether this is an instance method, which have an implicit first argument `this` with the type of the declaring class. */
@@ -24,14 +25,13 @@ class JvmMethodRef(
     val signature: JvmMethodSignature,
 ) : JvmMemberRef {
 
-    private val _name: String? = name
-    override val name: String get() = _name ?: if (isInstance) "<init>" else "<clinit>"
-    override val internalName: String get() = "${owner.internalName}#$name(..)"
-    override val javaName: String get() = "${owner.javaName}#$name(..)"
+    override val debugName: String get() = name ?: if (isInstance) "<init>" else "<clinit>"
+    override val internalName: String get() = if (isConstructor) "${owner.internalName}#${owner.name}(..)" else "${owner.internalName}#$name(..)"
+    override val javaName: String get() = if (isConstructor) "${owner.javaName}#${owner.name}(..)" else "${owner.javaName}#$name(..)"
     override val isStatic: Boolean get() = !isInstance
-    override val isConstructor: Boolean get() = _name == null
+    override val isConstructor: Boolean get() = name == null
     override val isField: Boolean get() = false
-    override val isMethod: Boolean get() = _name != null
+    override val isMethod: Boolean get() = name != null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -39,16 +39,17 @@ class JvmMethodRef(
         val that = other as JvmMethodRef
         // @formatter:off
         return this.owner == that.owner
-            && this._name == that._name
+            && this.name == that.name
             && this.isInstance == that.isInstance
             && this.signature == that.signature
         // @formatter:on
     }
 
     override fun hashCode(): Int {
+        // TODO: Use manual calculation
         return Objects.hash(
             owner,
-            _name,
+            name,
             isInstance,
             signature
         )
@@ -60,25 +61,21 @@ class JvmMethodRef(
 
     companion object {
         /**
-         * Gets the JVM reference of the specified method.
-         *
-         * @param method the method
-         * @return the method reference
+         * Gets the JVM reference to the given Java Reflection method.
+         * @return the JVM method reference
          */
-        fun of(method: Method): JvmMethodRef {
-            val name = method.name
-            val returnType = JvmType.of(method.returnType)
-            return of(name, returnType, method)
+        fun Method.ref(): JvmMethodRef {
+            val name = this.name
+            val returnType = JvmType.of(this.returnType)
+            return of(name, returnType, this)
         }
 
         /**
-         * Gets the JVM reference of the specified constructor.
-         *
-         * @param constructor the constructor
-         * @return the constructor reference
+         * Gets the JVM reference to the given Java Reflection constructor.
+         * @return the JVM constructor reference
          */
-        fun of(constructor: Constructor<*>): JvmMethodRef {
-            return of(null, JvmVoid, constructor)
+        fun Constructor<*>.ref(): JvmMethodRef {
+            return of(null, JvmVoid, this)
         }
 
         /**

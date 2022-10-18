@@ -344,7 +344,7 @@ class JvmClassBuilder internal constructor(
         modifiers: JvmFieldModifiers,
         signature: JvmFieldSignature,
         value: Any? = null
-    ): JvmFieldBuilder = createField(JvmFieldDecl(name, declaration, modifiers, signature), value)
+    ): JvmFieldBuilder = createField(JvmFieldDecl(name, declaration, signature, modifiers), value)
 
     /**
      * Creates a field with the specified definition and value.

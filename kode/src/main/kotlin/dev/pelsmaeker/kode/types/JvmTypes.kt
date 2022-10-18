@@ -27,7 +27,7 @@ object JvmTypes {
     val DoubleClass = JvmClassDecl.of(java.lang.Double::class.java)
 
     /** Package [java.lang]. */
-    private val Java_Lang = JvmPackageRef("java/lang")
+    private val Java_Lang = JvmPackageDecl("java.lang").ref()
 
     /** Class [java.lang.Object]. */
     val Object = JvmClassDecl.of(java.lang.Object::class.java)
@@ -44,14 +44,4 @@ object JvmTypes {
     /** Class [java.lang.System]. */
     val System = JvmClassDecl.of(java.lang.System::class.java)
 
-    /**
-     * Gets a reference to the package with the specified internal name.
-     *
-     * @param internalName the internal name of the package; or an empty string for the unnamed package
-     * @return the package reference
-     */
-    fun packageRef(internalName: String): JvmPackageRef {
-        // TODO: Perform caching to avoid creating lots of JvmPackageRef objects.
-        return JvmPackageRef(internalName)
-    }
 }

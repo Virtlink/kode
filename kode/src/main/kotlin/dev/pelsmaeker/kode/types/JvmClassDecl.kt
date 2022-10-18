@@ -1,5 +1,6 @@
 package dev.pelsmaeker.kode.types
 
+import dev.pelsmaeker.kode.types.JvmPackageRef.Companion.ref
 import java.lang.reflect.Modifier
 import java.nio.file.Path
 
@@ -54,7 +55,7 @@ data class JvmClassDecl @JvmOverloads constructor(
      * The fully-qualified internal name.
      *
      * Package names are separated with forward slash (`/`).
-     * Internal class names are separated with dollar sign (`$`) for both
+     * Class names are separated with dollar sign (`$`) for both
      * inner classes and static nested classes.
      */
     val internalName: String get() =
@@ -63,15 +64,15 @@ data class JvmClassDecl @JvmOverloads constructor(
     /**
      * Gets the fully-qualified Java name.
      *
-     * Internal package names are separated with dot (`.`).
-     * Internal class names are separated with dollar sign (`$`) for both
+     * Package names are separated with dot (`.`).
+     * Class names are separated with dollar sign (`$`) for both
      * inner classes and static nested classes.
      */
     val javaName: String get() =
         if (enclosingClass != null) "${enclosingClass.javaName}\$$name" else "${pkg.javaName}.$name"
 
     /**
-     * Resolves this reference in the specified path.
+     * Resolves this declaration in the specified path.
      *
      * @param rootPath the root path to resolve in
      * @return the path to the class `.class` file
@@ -164,7 +165,7 @@ data class JvmClassDecl @JvmOverloads constructor(
                 typeParams.add(typeParam)
             }
             val isInterface = Modifier.isInterface(cls.modifiers)
-            val pkg: JvmPackageRef = JvmPackageRef.of(cls.getPackage())
+            val pkg: JvmPackageRef = cls.getPackage().ref()
 
             // TODO: Fix names of inner classes and non-inner classes
             val className: String
