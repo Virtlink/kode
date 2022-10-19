@@ -14,8 +14,16 @@ class JvmMethodDecl(
     /** The signature of the method. */
     val signature: JvmMethodSignature,
     /** The modifiers of the method. */
-    val modifiers: JvmMethodModifiers,
+    val modifiers: JvmMethodModifiers = JvmMethodModifiers.None,
 ) {
+
+    constructor(
+        name: String?,
+        owner: JvmClassDecl,
+        returnType: JvmType,
+        parameters: List<JvmParam> = emptyList(),
+        modifiers: JvmMethodModifiers = JvmMethodModifiers.None,
+    ): this(name, owner, JvmMethodSignature(returnType, parameters), modifiers)
 
     /** The debug name of the method, which is the name of the method or a special identifier if it's a constructor. */
     val debugName: String get() = name ?: if (isInstance) "<init>" else "<clinit>"
@@ -76,7 +84,8 @@ class JvmMethodDecl(
      */
     fun ref(owner: JvmClassRef, typeArguments: List<JvmTypeArg>): JvmMethodRef {
         require(typeArguments.size == typeParameters.size) { "Expected ${typeParameters.size} type arguments, got ${typeArguments.size}: ${typeArguments.joinToString()}" }
-        return JvmMethodRef(this, owner)
+        // TODO: Type parameters are not relevant?
+        return JvmMethodRef(name, owner, returnType, parameters, isInstance)
     }
 
     override fun toString(): String = StringBuilder().apply {
@@ -84,7 +93,7 @@ class JvmMethodDecl(
         append(if (isConstructor) "constructor " else "method ")
         if (typeParameters.isNotEmpty()) typeParameters.joinTo(this, prefix = "<", postfix = "> ")
         append(owner.javaName)
-        append('.')
+        append("::")
         append(name)
         parameters.joinTo(this, prefix = "(", postfix = "): ")
         append(returnType)

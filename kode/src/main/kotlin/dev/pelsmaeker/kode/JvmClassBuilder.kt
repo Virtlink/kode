@@ -113,8 +113,8 @@ class JvmClassBuilder internal constructor(
         require(toMethod.owner.declaration == this.declaration) {
             "Bridged method is declared in ${toMethod.owner.declaration}, but the class being built is ${this.declaration}."
         }
-        require(declaration.signature.parameters.size == toMethod.signature.parameters.size) {
-            "Signatures must have the same number of parameters: ${declaration.signature} -> ${toMethod.signature}"
+        require(declaration.signature.parameters.size == toMethod.parameters.size) {
+            "Methods must have the same number of parameters: ${declaration.parameters} -> ${toMethod.parameters}"
         }
         require(JvmMethodModifiers.Bridge in declaration.modifiers) {
             "Bridge method needs the Bridge modifier."
@@ -131,13 +131,13 @@ class JvmClassBuilder internal constructor(
                 body.aLoad(_this)
 
                 // Load each of the incoming arguments onto the stack.
-                val fromSignature: JvmMethodSignature = declaration.signature
-                val toSignature: JvmMethodSignature = toMethod.signature
-                val paramCount: Int = fromSignature.parameters.size
+                val fromParameters = declaration.parameters
+                val toParameters = toMethod.parameters
+                val paramCount = fromParameters.size
                 for (i in 0 until paramCount) {
-                    val fromParam: JvmParam = fromSignature.parameters[i]
-                    val toParam: JvmParam = toSignature.parameters[i]
-                    val localVar: JvmLocalVar = body.localVar(fromParam.name, fromParam.type)
+                    val fromParam = fromParameters[i]
+                    val toParam = toParameters[i]
+                    val localVar = body.localVar(fromParam.name, fromParam.type)
                     body.aLoad(localVar)
                     if (localVar.type != toParam.type) {
                         // Load each of the incoming arguments onto the stack.
@@ -200,13 +200,13 @@ class JvmClassBuilder internal constructor(
     }
 
     /**
-     * Creates a constructor.
+     * Creates an instance constructor.
      *
      * @param parameters the constructor's parameters
      * @param modifiers the constructor's modifiers
      * @return a [JvmMethodBuilder]
      */
-    fun createConstructor(parameters: List<JvmParam>, modifiers: JvmMethodModifiers): JvmMethodBuilder {
+    fun createConstructor(parameters: List<JvmParam> = emptyList(), modifiers: JvmMethodModifiers = JvmMethodModifiers.None): JvmMethodBuilder {
         require(JvmMethodModifiers.Static !in modifiers) {
             "Instance constructor must not have Static modifier."
         }

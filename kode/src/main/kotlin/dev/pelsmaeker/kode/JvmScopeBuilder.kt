@@ -822,7 +822,7 @@ class JvmScopeBuilder(
                     org.objectweb.asm.Opcodes.INVOKESPECIAL,
                     method.owner.internalName,
                     "<init>",
-                    method.signature.descriptor,
+                    method.descriptor,
                     false
                 )
             }
@@ -832,7 +832,7 @@ class JvmScopeBuilder(
                 org.objectweb.asm.Opcodes.INVOKESTATIC,
                 method.owner.internalName,
                 method.name,
-                method.signature.descriptor,
+                method.descriptor,
                 method.owner.isInterface
             )
         } else if (method.owner.isInterface) {
@@ -841,7 +841,7 @@ class JvmScopeBuilder(
                 org.objectweb.asm.Opcodes.INVOKEINTERFACE,
                 method.owner.internalName,
                 method.name,
-                method.signature.descriptor,
+                method.descriptor,
                 true
             )
         } else {
@@ -850,7 +850,7 @@ class JvmScopeBuilder(
                 org.objectweb.asm.Opcodes.INVOKEVIRTUAL,
                 method.owner.internalName,
                 method.name,
-                method.signature.descriptor,
+                method.descriptor,
                 false
             )
         }

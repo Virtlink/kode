@@ -19,11 +19,7 @@ data class JvmMethodSignature @JvmOverloads constructor(
     /** The arity of the method. */
     val arity: Int get() = parameters.size
 
-    /**
-     * Gets the method's JVM descriptor.
-     *
-     * @return the JVM descriptor string
-     */
+    /** The method's JVM descriptor. */
     val descriptor: String get() = StringBuilder().apply {
         parameters.joinTo(this, prefix = "(", postfix = ")") { it.type.descriptor }
         append(returnType.descriptor)
