@@ -639,6 +639,7 @@ class JvmScopeBuilder(
     //////////////////
     // CONTROL FLOW //
     //////////////////
+
     /** Pop an object reference from the stack and throw it. */
     fun aThrow() {
         methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ATHROW)
@@ -702,9 +703,92 @@ class JvmScopeBuilder(
             else -> throw UnsupportedOperationException("Unsupported return value: $type")
         }
     }
+
+    /**
+     * Pops an integer value from the stack and looks it up in the map.
+     * Jumps to the label corresponding to the value;
+     * otherwise, jumps to the default label.
+     *
+     * @param targets the jump targets
+     * @param defaultTarget the default target if none of the specified targets match
+     */
+    fun switch(targets: Map<Int, JvmLabel>, defaultTarget: JvmLabel) {
+        if (targets.isEmpty()) {
+            jump(defaultTarget)
+            return
+        }
+
+        val maxCount = targets.keys.max() - targets.keys.min() + 1
+        val actualCount = targets.size
+        if (maxCount - actualCount > 10)
+            lookupSwitch(targets, defaultTarget)
+        else
+            tableSwitch(targets, defaultTarget)
+    }
+
+    /**
+     * Pops an integer value from the stack and looks it up in the map.
+     * Jumps to the label corresponding to the value;
+     * otherwise, jumps to the default label.
+     *
+     * This method is fast if the values are far apart.
+     *
+     * @param targets the jump targets
+     * @param defaultTarget the default target if none of the specified targets match
+     */
+    fun lookupSwitch(targets: Map<Int, JvmLabel>, defaultTarget: JvmLabel) {
+        if (targets.isEmpty()) {
+            jump(defaultTarget)
+            return
+        }
+
+        val sorted = targets.entries.sortedBy { it.key }
+        methodBuilder.methodVisitor.visitLookupSwitchInsn(
+            defaultTarget.internalLabel,
+            sorted.map { it.key }.toIntArray(),
+            sorted.map { it.value.internalLabel }.toTypedArray(),
+        )
+    }
+
+    /**
+     * Pops an integer value from the stack and looks it up in the map.
+     * Jumps to the label corresponding to the value;
+     * otherwise, jumps to the default label.
+     *
+     * This method is fast if the values are close together.
+     *
+     * @param targets the jump targets
+     * @param defaultTarget the default target if none of the specified targets match
+     */
+    fun tableSwitch(targets: Map<Int, JvmLabel>, defaultTarget: JvmLabel) {
+        if (targets.isEmpty()) {
+            jump(defaultTarget)
+            return
+        }
+
+        val sorted = targets.entries.sortedBy { it.key }
+        val min = sorted.first().key
+        val max = sorted.last().key
+
+        // Populate the array with the labels; or null if an entry is not present
+        val labels = arrayOfNulls<JvmLabel>(max - min + 1)
+        for (i in min .. max) {
+            labels[i - min] = targets[i]
+        }
+
+        methodBuilder.methodVisitor.visitTableSwitchInsn(
+            min,
+            max,
+            defaultTarget.internalLabel,
+            // If the entry is null, jump to the default label
+            *labels.map { it?.internalLabel ?: defaultTarget.internalLabel }.toTypedArray()
+        )
+    }
+
     /////////////////////////////
     // METHOD and CONSTRUCTORS //
     /////////////////////////////
+
     /**
      * Invoke an instance constructor on a class.
      *
@@ -793,9 +877,11 @@ class JvmScopeBuilder(
             arguments
         )
     }
+
     ////////////
     // FIELDS //
     ////////////
+
     /**
      * Pop an object reference from the stack,
      * and push the value of an instance field of the given type back onto the stack.
@@ -849,6 +935,7 @@ class JvmScopeBuilder(
     //////////
     // MISC //
     //////////
+
     /**
      * Assert that the condition holds.
      *
