@@ -18,7 +18,7 @@ class JvmMethodDecl(
 ) {
 
     /** The debug name of the method, which is the name of the method or a special identifier if it's a constructor. */
-    val debugName: String get() = name ?: if (isInstance) "<init>" else "<cinit>"
+    val debugName: String get() = name ?: if (isInstance) "<init>" else "<clinit>"
 
     /** The type of the method's return value. */
     val returnType: JvmType get() = signature.returnType
