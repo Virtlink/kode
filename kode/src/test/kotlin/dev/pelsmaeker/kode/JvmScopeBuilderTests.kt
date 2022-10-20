@@ -98,88 +98,35 @@ class JvmScopeBuilderTests {
     }
 
     @Test
-    fun `load() should load an Integer onto the stack`() {
+    fun `load() should load a value onto the stack`() {
         // Arrange
-        val value = 6
-        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger, listOf(JvmParam(JvmInteger, "a"))) {
-            val a = localVars.getArgument("a")!!
-            load(a)
-            iReturn()
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid, listOf(
+            JvmParam(JvmInteger, "i"),
+            JvmParam(JvmLong, "l"),
+            JvmParam(JvmFloat, "f"),
+            JvmParam(JvmDouble, "d"),
+            JvmParam(JvmTypes.Object.ref(), "o"),
+        )) {
+            val i = localVars.getArgument("i")!!
+            val l = localVars.getArgument("l")!!
+            val f = localVars.getArgument("f")!!
+            val d = localVars.getArgument("d")!!
+            val o = localVars.getArgument("o")!!
+//            load(i)
+//            load(l)
+//            load(f)
+            load(d)
+//            load(o)
+//            pop()
+            pop2()
+//            pop()
+//            pop2()
+//            pop()
+            ret()
         }
 
-        // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
-
-        // Assert
-        assertEquals(value, result)
-    }
-
-    @Test
-    fun `load() should load a Long onto the stack`() {
-        // Arrange
-        val value = 6L
-        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmLong, listOf(JvmParam(JvmLong, "a"))) {
-            val a = localVars.getArgument("a")!!
-            load(a)
-            lReturn()
-        }
-
-        // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
-
-        // Assert
-        assertEquals(value, result)
-    }
-
-    @Test
-    fun `load() should load a Float onto the stack`() {
-        // Arrange
-        val value = 6.0f
-        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmFloat, listOf(JvmParam(JvmFloat, "a"))) {
-            val a = localVars.getArgument("a")!!
-            load(a)
-            fReturn()
-        }
-
-        // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
-
-        // Assert
-        assertEquals(value, result)
-    }
-
-    @Test
-    fun `load() should load a Double onto the stack`() {
-        // Arrange
-        val value = 6.0
-        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmDouble, listOf(JvmParam(JvmDouble, "a"))) {
-            val a = localVars.getArgument("a")!!
-            load(a)
-            dReturn()
-        }
-
-        // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
-
-        // Assert
-        assertEquals(value, result)
-    }
-
-    @Test
-    fun `load() should load an Object onto the stack`() {
-        // Arrange
-        val value = "My object"
-        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmTypes.Object.ref(), listOf(JvmParam(JvmTypes.Object.ref(), "a"))) {
-            val a = localVars.getArgument("a")!!
-            load(a)
-            aReturn()
-        }
-
-        // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
-
-        // Assert
-        assertEquals(value, result)
+        // Act/Assert
+        compiledClass.runEvalMethod(methodDecl, 1, 2L, 3.0f, 4.0, "S")
     }
 
     private fun JvmCompiledClass.runEvalMethod(methodDecl: JvmMethodDecl, vararg args: Any?): Any? {

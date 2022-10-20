@@ -15,14 +15,14 @@ import java.util.*
  */
 abstract class Scoped<SELF : Scoped<SELF>> protected constructor(
     /** The name of the scope, for debugging purposes. */
-    name: String? = null,
+    debugName: String? = null,
     /** The parent scope; or `null`. */
     protected val parent: SELF? = null,
 ): AutoCloseable {
 
-    private val _name: String? = name
+    private val _debugName: String? = debugName
     /** The name of the scope, for debugging purposes. */
-    protected val name: String get() = _name ?: parent?.children?.indexOf(this)?.toString() ?: "root"
+    protected val debugName: String get() = _debugName ?: parent?.children?.indexOf(this)?.toString() ?: "root"
 
     private val _children: MutableList<SELF> = mutableListOf()
     /** Child scopes. If this set is not empty, this scope cannot be used or closed. */
@@ -66,8 +66,8 @@ abstract class Scoped<SELF : Scoped<SELF>> protected constructor(
      */
     protected fun getFullName(maxAncestor: Scoped<SELF>? = null): String {
         val ancestors = getAncestors().takeWhile { it != maxAncestor }.toList()
-        if (ancestors.isEmpty()) return name
-        return ancestors.asReversed().joinToString(separator = "/", postfix = "/") { it.name } + name
+        if (ancestors.isEmpty()) return debugName
+        return ancestors.asReversed().joinToString(separator = "/", postfix = "/") { it.debugName } + debugName
     }
 
     /**
@@ -118,7 +118,7 @@ abstract class Scoped<SELF : Scoped<SELF>> protected constructor(
      */
     private fun checkChildless() {
         check(children.isEmpty()) {
-            "This scope $name cannot be used, because it has open child scopes: " + getDescendants().joinToString(limit = 10) { it.getFullName(this) }
+            "This scope $debugName cannot be used, because it has open child scopes: " + getDescendants().joinToString(limit = 10) { it.getFullName(this) }
         }
     }
 

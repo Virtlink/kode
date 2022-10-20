@@ -83,7 +83,7 @@ class JvmMethodBuilder internal constructor(
                 null,  // TODO: When to add a signature? When it has a type argument? localVar.getType().getSignature()
                 localVar.scope.startLabel.internalLabel,
                 localVar.scope.endLabel.internalLabel,
-                localVar.index
+                localVar.offset
             )
         }
 

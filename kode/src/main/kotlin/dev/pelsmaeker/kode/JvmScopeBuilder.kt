@@ -5,6 +5,7 @@ import dev.pelsmaeker.kode.types.*
 import dev.pelsmaeker.kode.utils.Eponymizer
 import dev.pelsmaeker.kode.utils.requireIsJvmType
 import org.objectweb.asm.Type
+import org.objectweb.asm.Opcodes
 
 /**
  * Builds a JVM code scope.
@@ -24,13 +25,13 @@ class JvmScopeBuilder(
 ): Scoped<JvmScopeBuilder>(name, parent), JvmScope {
 
     /** The label for the start of the scope. */
-    override val startLabel: JvmLabel = JvmLabel(this.name + "_start")
+    override val startLabel: JvmLabel = JvmLabel(this.debugName + "_start")
 
     /** The label for the end of the scope. */
-    override val endLabel: JvmLabel = JvmLabel(this.name + "_end")
+    override val endLabel: JvmLabel = JvmLabel(this.debugName + "_end")
 
     /** The local variables in this scope. */
-    val localVars: JvmLocalVars = JvmLocalVars(methodBuilder.declaredLocalVars, this, name, parent?.localVars)
+    val localVars: JvmLocalVars = JvmLocalVars(this, name, parent?.localVars, methodBuilder.declaredLocalVars)
 
     init {
         // Add the start label
@@ -113,7 +114,7 @@ class JvmScopeBuilder(
      */
     fun iLoad(variable: JvmLocalVar) {
         requireIsJvmType(JvmInteger, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ILOAD, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ILOAD, variable.offset)
     }
 
     /**
@@ -123,7 +124,7 @@ class JvmScopeBuilder(
      */
     fun lLoad(variable: JvmLocalVar) {
         requireIsJvmType(JvmLong, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.LLOAD, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.LLOAD, variable.offset)
     }
 
     /**
@@ -133,7 +134,7 @@ class JvmScopeBuilder(
      */
     fun fLoad(variable: JvmLocalVar) {
         requireIsJvmType(JvmFloat, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.FLOAD, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.FLOAD, variable.offset)
     }
 
     /**
@@ -143,7 +144,7 @@ class JvmScopeBuilder(
      */
     fun dLoad(variable: JvmLocalVar) {
         requireIsJvmType(JvmDouble, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.DLOAD, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.DLOAD, variable.offset)
     }
 
     /**
@@ -155,7 +156,7 @@ class JvmScopeBuilder(
         require(variable.type.kind == JvmTypeKind.Object) {
             "Expected class or interface type, got ${variable.type}."
         }
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ALOAD, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ALOAD, variable.offset)
     }
 
     /**
@@ -187,7 +188,7 @@ class JvmScopeBuilder(
      */
     fun iStore(variable: JvmLocalVar) {
         requireIsJvmType(JvmInteger, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ISTORE, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ISTORE, variable.offset)
     }
 
     /**
@@ -197,7 +198,7 @@ class JvmScopeBuilder(
      */
     fun lStore(variable: JvmLocalVar) {
         requireIsJvmType(JvmLong, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.LSTORE, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.LSTORE, variable.offset)
     }
 
     /**
@@ -207,7 +208,7 @@ class JvmScopeBuilder(
      */
     fun fStore(variable: JvmLocalVar) {
         requireIsJvmType(JvmFloat, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.FSTORE, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.FSTORE, variable.offset)
     }
 
     /**
@@ -217,7 +218,7 @@ class JvmScopeBuilder(
      */
     fun dStore(variable: JvmLocalVar) {
         requireIsJvmType(JvmDouble, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.DSTORE, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.DSTORE, variable.offset)
     }
 
     /**
@@ -229,7 +230,7 @@ class JvmScopeBuilder(
         require(variable.type.kind == JvmTypeKind.Object) {
             "Expected class or interface type, got ${variable.type}."
         }
-        methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ASTORE, variable.index)
+        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ASTORE, variable.offset)
     }
 
     /**
@@ -270,47 +271,47 @@ class JvmScopeBuilder(
 
     /** Pop the top value from the stack. */
     fun pop() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.POP)
     }
 
     /** Pop the top two values from the stack. */
     fun pop2() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.POP2)
     }
 
     /** Swap the top two values on the stack. */
     fun swap() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.SWAP)
     }
 
     /** Duplicate the top value on the stack. */
     fun dup() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.DUP)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP)
     }
 
     /** Duplicate the top value up to two values below the top of the stack. */
     fun dup_x1() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X1)
     }
 
     /** Duplicate the top value up to three values below the top of the stack. */
     fun dup_x2() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X2)
     }
 
     /** Duplicate the top two values on the stack. */
     fun dup2() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2)
     }
 
     /** Duplicate the up to two top values up to three values below the top of the stack. */
     fun dup2_x1() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2_X1)
     }
 
     /** Duplicate the up to two top values up to four values below the top of the stack. */
     fun dup2_x2() {
-        TODO()
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2_X2)
     }
 
     ///////////////
@@ -319,77 +320,77 @@ class JvmScopeBuilder(
 
     /** Push constant integer -1 on the stack. */
     fun iConst_m1() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ICONST_M1)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_M1)
     }
 
     /** Push constant integer 0 on the stack. */
     fun iConst_0() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ICONST_0)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_0)
     }
 
     /** Push constant integer 1 on the stack. */
     fun iConst_1() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ICONST_1)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_1)
     }
 
     /** Push constant integer 2 on the stack. */
     fun iConst_2() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ICONST_2)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_2)
     }
 
     /** Push constant integer 3 on the stack. */
     fun iConst_3() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ICONST_3)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_3)
     }
 
     /** Push constant integer 4 on the stack. */
     fun iConst_4() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ICONST_4)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_4)
     }
 
     /** Push constant integer 5 on the stack. */
     fun iConst_5() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ICONST_5)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_5)
     }
 
     /** Push constant long integer 0 on the stack. */
     fun lConst_0() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.LCONST_0)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_0)
     }
 
     /** Push constant long integer 1 on the stack. */
     fun lConst_1() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.LCONST_1)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_1)
     }
 
     /** Push constant float 0 on the stack. */
     fun fConst_0() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.FCONST_0)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_0)
     }
 
     /** Push constant float 1 on the stack. */
     fun fConst_1() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.FCONST_1)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_1)
     }
 
     /** Push constant float 2 on the stack. */
     fun fConst_2() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.FCONST_2)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_2)
     }
 
     /** Push constant double 0 on the stack. */
     fun dConst_0() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.DCONST_0)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_0)
     }
 
     /** Push constant double 1 on the stack. */
     fun dConst_1() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.DCONST_1)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_1)
     }
 
     /** Push constant null on the stack. */
     fun aConst_Null() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ACONST_NULL)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ACONST_NULL)
     }
 
     /**
@@ -470,7 +471,7 @@ class JvmScopeBuilder(
      * @param value the constant byte value to push
      */
     fun biPush(value: Byte) {
-        methodBuilder.methodVisitor.visitIntInsn(org.objectweb.asm.Opcodes.BIPUSH, value.toInt())
+        methodBuilder.methodVisitor.visitIntInsn(Opcodes.BIPUSH, value.toInt())
     }
 
     /**
@@ -479,7 +480,7 @@ class JvmScopeBuilder(
      * @param value the constant short value to push
      */
     fun siPush(value: Short) {
-        methodBuilder.methodVisitor.visitIntInsn(org.objectweb.asm.Opcodes.SIPUSH, value.toInt())
+        methodBuilder.methodVisitor.visitIntInsn(Opcodes.SIPUSH, value.toInt())
     }
 
     /**
@@ -521,7 +522,7 @@ class JvmScopeBuilder(
      * @param type the type to create
      */
     fun newInst(type: JvmClassRef) {
-        methodBuilder.methodVisitor.visitTypeInsn(org.objectweb.asm.Opcodes.NEW, type.internalName)
+        methodBuilder.methodVisitor.visitTypeInsn(Opcodes.NEW, type.internalName)
     }
 
     ////////////
@@ -539,7 +540,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifGt(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFGT, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFGT, label.internalLabel)
     }
 
     /**
@@ -548,7 +549,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifGe(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFGE, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFGE, label.internalLabel)
     }
 
     /**
@@ -557,7 +558,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifEq(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFEQ, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFEQ, label.internalLabel)
     }
 
     /**
@@ -566,7 +567,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifNe(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFNE, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFNE, label.internalLabel)
     }
 
     /**
@@ -575,7 +576,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifLe(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFLE, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFLE, label.internalLabel)
     }
 
     /**
@@ -584,7 +585,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifLt(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFLT, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFLT, label.internalLabel)
     }
 
     /**
@@ -593,7 +594,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifNull(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFNULL, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFNULL, label.internalLabel)
     }
 
     /**
@@ -602,7 +603,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to if the condition holds
      */
     fun ifNonNull(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.IFNONNULL, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFNONNULL, label.internalLabel)
     }
 
     /**
@@ -613,7 +614,7 @@ class JvmScopeBuilder(
      * @param label the label to jump to
      */
     fun jump(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(org.objectweb.asm.Opcodes.GOTO, label.internalLabel)
+        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.GOTO, label.internalLabel)
     }
 
     /////////////////////////////
@@ -657,32 +658,32 @@ class JvmScopeBuilder(
 
     /** Pop an object reference from the stack and throw it. */
     fun aThrow() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ATHROW)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ATHROW)
     }
 
     /** Pop an `int` from the stack and return it. */
     fun iReturn() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.IRETURN)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.IRETURN)
     }
 
     /** Pop a `long` from the stack and return it. */
     fun lReturn() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.LRETURN)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.LRETURN)
     }
 
     /** Pop a `float` from the stack and return it. */
     fun fReturn() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.FRETURN)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.FRETURN)
     }
 
     /** Pop a `double` from the stack and return it. */
     fun dReturn() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.DRETURN)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DRETURN)
     }
 
     /** Pop an object reference from the stack and return it. */
     fun aReturn() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.ARETURN)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ARETURN)
     }
 
     /**
@@ -691,7 +692,7 @@ class JvmScopeBuilder(
      * This method is named [.ret] because `return` is a reserved Java keyword.
      */
     fun ret() {
-        methodBuilder.methodVisitor.visitInsn(org.objectweb.asm.Opcodes.RETURN)
+        methodBuilder.methodVisitor.visitInsn(Opcodes.RETURN)
     }
 
     /**
@@ -834,7 +835,7 @@ class JvmScopeBuilder(
             } else {
                 // Instance constructor
                 methodBuilder.methodVisitor.visitMethodInsn(
-                    org.objectweb.asm.Opcodes.INVOKESPECIAL,
+                    Opcodes.INVOKESPECIAL,
                     method.owner.internalName,
                     "<init>",
                     method.descriptor,
@@ -844,7 +845,7 @@ class JvmScopeBuilder(
         } else if (method.isStatic) {
             // Static method
             methodBuilder.methodVisitor.visitMethodInsn(
-                org.objectweb.asm.Opcodes.INVOKESTATIC,
+                Opcodes.INVOKESTATIC,
                 method.owner.internalName,
                 method.name,
                 method.descriptor,
@@ -853,7 +854,7 @@ class JvmScopeBuilder(
         } else if (method.owner.isInterface) {
             // Instance method on an interface
             methodBuilder.methodVisitor.visitMethodInsn(
-                org.objectweb.asm.Opcodes.INVOKEINTERFACE,
+                Opcodes.INVOKEINTERFACE,
                 method.owner.internalName,
                 method.name,
                 method.descriptor,
@@ -862,7 +863,7 @@ class JvmScopeBuilder(
         } else {
             // Instance method on a class
             methodBuilder.methodVisitor.visitMethodInsn(
-                org.objectweb.asm.Opcodes.INVOKEVIRTUAL,
+                Opcodes.INVOKEVIRTUAL,
                 method.owner.internalName,
                 method.name,
                 method.descriptor,
@@ -907,14 +908,14 @@ class JvmScopeBuilder(
         require(field.owner.isClass) { "This type is not a class: " + field.owner }
         if (field.isInstance) {
             methodBuilder.methodVisitor.visitFieldInsn(
-                org.objectweb.asm.Opcodes.GETFIELD,
+                Opcodes.GETFIELD,
                 field.owner.internalName,
                 field.name,
                 field.signature.descriptor
             )
         } else {
             methodBuilder.methodVisitor.visitFieldInsn(
-                org.objectweb.asm.Opcodes.GETSTATIC,
+                Opcodes.GETSTATIC,
                 field.owner.internalName,
                 field.name,
                 field.signature.descriptor
@@ -932,14 +933,14 @@ class JvmScopeBuilder(
         require(field.owner.isClass) { "This type is not a class: " + field.owner }
         if (field.isInstance) {
             methodBuilder.methodVisitor.visitFieldInsn(
-                org.objectweb.asm.Opcodes.PUTFIELD,
+                Opcodes.PUTFIELD,
                 field.owner.internalName,
                 field.name,
                 field.signature.descriptor
             )
         } else {
             methodBuilder.methodVisitor.visitFieldInsn(
-                org.objectweb.asm.Opcodes.PUTSTATIC,
+                Opcodes.PUTSTATIC,
                 field.owner.internalName,
                 field.name,
                 field.signature.descriptor

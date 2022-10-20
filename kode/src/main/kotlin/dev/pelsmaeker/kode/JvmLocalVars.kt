@@ -12,15 +12,15 @@ import dev.pelsmaeker.kode.utils.Scoped
  * same name and/or index, as long as they are unique in the context of the parents.
  */
 class JvmLocalVars(
-    /** The list of local variables declared in the method. */
-    declaredLocalVars: List<JvmLocalVar>,
     /** The scope of any declared local variables. */
     private val scope: JvmScope,
     /** The debug name; or `null`. */
-    name: String? = null,
+    debugName: String? = null,
     /** The parent local variables. */
     parent: JvmLocalVars? = null,
-): Scoped<JvmLocalVars>(name, parent), Iterable<JvmLocalVar> {
+    /** The list of local variables declared in the method. */
+    declaredLocalVars: List<JvmLocalVar> = emptyList(),
+): Scoped<JvmLocalVars>(debugName, parent), Iterable<JvmLocalVar> {
 
     /** The list of local variables declared in the method. */
     private val declaredLocalVars: MutableList<JvmLocalVar> = declaredLocalVars.toMutableList()
@@ -144,7 +144,9 @@ class JvmLocalVars(
      * @return the added local variable
      */
     fun addArgument(parameter: JvmParam): JvmLocalVar {
-        check(size <= argumentCount + if (hasThis) 1 else 0) { "Other local variables have already been added." }
+        check(size <= argumentCount + if (hasThis) 1 else 0) {
+            "Other local variables have already been added."
+        }
         _argumentCount += 1
         return addLocalVar(parameter.type, parameter.name)
     }
@@ -157,7 +159,9 @@ class JvmLocalVars(
      * @return the created local variable
      */
     fun addLocalVar(type: JvmType, name: String? = null): JvmLocalVar {
-        require(!localVarsByName.containsKey(name)) { "A local variable with the name '$name' already exists." }
+        require(!localVarsByName.containsKey(name)) {
+            "A local variable with the name '$name' already exists."
+        }
         val index = freshLocalVarIndex
         val localVar = JvmLocalVar(name, type, scope, index)
         localVars.add(localVar)
@@ -172,14 +176,14 @@ class JvmLocalVars(
      * This scope cannot be used while any child scope is not closed.
      *
      * @param scope the child scope
-     * @param name a debug name for the [JvmLocalVars]; or `null`
+     * @param debugName a debug name for the [JvmLocalVars]; or `null`
      * @return a child [JvmLocalVars]
      */
-    fun scope(scope: JvmScope, name: String?): JvmLocalVars {
+    fun scope(scope: JvmScope, debugName: String?): JvmLocalVars {
         // We just pass the same `declaredLocalVars` on.
         // Every local variable that is added to this child JvmLocalVars
         // is also added to the `declaredLocalVars` of the method.
-        return adoptChild(JvmLocalVars(declaredLocalVars, scope, name, this))
+        return adoptChild(JvmLocalVars(scope, debugName, this, declaredLocalVars))
     }
 
     /**

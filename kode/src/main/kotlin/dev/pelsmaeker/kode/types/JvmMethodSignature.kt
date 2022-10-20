@@ -21,16 +21,16 @@ data class JvmMethodSignature @JvmOverloads constructor(
 
     /** The method's JVM descriptor. */
     val descriptor: String get() = StringBuilder().apply {
-        parameters.joinTo(this, prefix = "(", postfix = ")") { it.type.descriptor }
+        parameters.joinTo(this, prefix = "(", postfix = ")", separator = "") { it.type.descriptor }
         append(returnType.descriptor)
     }.toString()
 
     /** The method's JVM signature. */
     val signature: String = StringBuilder().apply {
         if (typeParameters.isNotEmpty()) {
-            typeParameters.joinTo(this, prefix = "<", postfix = ">") { it.signature }
+            typeParameters.joinTo(this, prefix = "<", postfix = ">", separator = "") { it.signature }
         }
-        parameters.joinTo(this, prefix = "(", postfix = ")") { it.type.signature }
+        parameters.joinTo(this, prefix = "(", postfix = ")", separator = "") { it.type.signature }
         append(returnType.signature)
         throwableTypes.joinTo(this, prefix = "^", separator = "^")
     }.toString()
