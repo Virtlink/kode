@@ -1,8 +1,6 @@
 package dev.pelsmaeker.kode.types
 
-
 import java.lang.reflect.*
-
 
 /**
  * A JVM class reference.
@@ -53,7 +51,7 @@ data class JvmClassRef internal constructor(
         } else {
             append(declaration.internalName)
         }
-        if (!typeArguments.isEmpty()) {
+        if (typeArguments.isNotEmpty()) {
             append('<')
             for (typeArg in typeArguments) {
                 append(typeArg.signature)
@@ -61,6 +59,11 @@ data class JvmClassRef internal constructor(
             append('>')
         }
     }.toString()
+
+    override fun toJavaType(classLoader: ClassLoader?): Type {
+        // TODO: Use classLoader
+        return Class.forName(javaName)
+    }
 
     override fun toString(): String = StringBuilder().apply {
         append(if (declaration.isInterface) "interface " else "class ")

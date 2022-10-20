@@ -118,10 +118,10 @@ class JvmLocalVars(
         val index = localVarsByName[name]
         if (index == null) {
             return parent?.getArgument(name)
-        } else if (index >= argumentCount) {
+        } else if (index >= argumentCount + if (hasThis) 1 else 0) {
             return null
         }
-        return getArgument(index)
+        return getArgument(index - if (hasThis) 1 else 0)
     }
 
     /**

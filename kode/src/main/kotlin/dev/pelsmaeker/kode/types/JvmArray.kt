@@ -1,5 +1,7 @@
 package dev.pelsmaeker.kode.types
 
+import java.lang.reflect.Type
+
 /**
  * An array type.
  */
@@ -21,6 +23,11 @@ data class JvmArray(
 
     /** The number of dimensions in the array. */
     val dimensionCount: Int get() = (elementType as? JvmArray)?.let { it.dimensionCount + 1} ?: 1
+
+    override fun toJavaType(classLoader: ClassLoader?): Type {
+        // TODO: Use classLoader
+        return Class.forName(descriptor)
+    }
 
     override fun toString(): String = "$elementType[]"
 }

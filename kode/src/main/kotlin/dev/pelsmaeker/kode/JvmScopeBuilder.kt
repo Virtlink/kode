@@ -3,6 +3,7 @@ package dev.pelsmaeker.kode
 import dev.pelsmaeker.kode.utils.Scoped
 import dev.pelsmaeker.kode.types.*
 import dev.pelsmaeker.kode.utils.Eponymizer
+import dev.pelsmaeker.kode.utils.requireIsJvmType
 import org.objectweb.asm.Type
 
 /**
@@ -111,6 +112,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to load from
      */
     fun iLoad(variable: JvmLocalVar) {
+        requireIsJvmType(JvmInteger, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ILOAD, variable.index)
     }
 
@@ -120,6 +122,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to load from
      */
     fun lLoad(variable: JvmLocalVar) {
+        requireIsJvmType(JvmLong, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.LLOAD, variable.index)
     }
 
@@ -129,6 +132,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to load from
      */
     fun fLoad(variable: JvmLocalVar) {
+        requireIsJvmType(JvmFloat, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.FLOAD, variable.index)
     }
 
@@ -138,6 +142,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to load from
      */
     fun dLoad(variable: JvmLocalVar) {
+        requireIsJvmType(JvmDouble, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.DLOAD, variable.index)
     }
 
@@ -147,6 +152,9 @@ class JvmScopeBuilder(
      * @param variable the local variable to load from
      */
     fun aLoad(variable: JvmLocalVar) {
+        require(variable.type.kind == JvmTypeKind.Object) {
+            "Expected class or interface type, got ${variable.type}."
+        }
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ALOAD, variable.index)
     }
 
@@ -159,10 +167,10 @@ class JvmScopeBuilder(
      */
     fun load(variable: JvmLocalVar) {
         when (variable.type.kind) {
+            JvmTypeKind.Integer -> iLoad(variable)
             JvmTypeKind.Long -> lLoad(variable)
             JvmTypeKind.Float -> fLoad(variable)
             JvmTypeKind.Double -> dLoad(variable)
-            JvmTypeKind.Integer -> iLoad(variable)
             JvmTypeKind.Object -> aLoad(variable)
             else -> throw UnsupportedOperationException("Unsupported type: " + variable.type)
         }
@@ -178,6 +186,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to store to
      */
     fun iStore(variable: JvmLocalVar) {
+        requireIsJvmType(JvmInteger, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ISTORE, variable.index)
     }
 
@@ -187,6 +196,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to store to
      */
     fun lStore(variable: JvmLocalVar) {
+        requireIsJvmType(JvmLong, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.LSTORE, variable.index)
     }
 
@@ -196,6 +206,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to store to
      */
     fun fStore(variable: JvmLocalVar) {
+        requireIsJvmType(JvmFloat, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.FSTORE, variable.index)
     }
 
@@ -205,6 +216,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to store to
      */
     fun dStore(variable: JvmLocalVar) {
+        requireIsJvmType(JvmDouble, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.DSTORE, variable.index)
     }
 
@@ -214,6 +226,9 @@ class JvmScopeBuilder(
      * @param variable the local variable to store to
      */
     fun aStore(variable: JvmLocalVar) {
+        require(variable.type.kind == JvmTypeKind.Object) {
+            "Expected class or interface type, got ${variable.type}."
+        }
         methodBuilder.methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ASTORE, variable.index)
     }
 
@@ -226,10 +241,10 @@ class JvmScopeBuilder(
      */
     fun store(variable: JvmLocalVar) {
         when (variable.type.kind) {
+            JvmTypeKind.Integer -> iStore(variable)
             JvmTypeKind.Long -> lStore(variable)
             JvmTypeKind.Float -> fStore(variable)
             JvmTypeKind.Double -> dStore(variable)
-            JvmTypeKind.Integer -> iStore(variable)
             JvmTypeKind.Object -> aStore(variable)
             else -> throw UnsupportedOperationException("Unsupported type: " + variable.type)
         }

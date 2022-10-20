@@ -38,7 +38,7 @@ class JvmClassBuilder internal constructor(
         }
         val methodVisitor: org.objectweb.asm.MethodVisitor = classWriter.visitMethod(
             declaration.modifiers.value,
-            declaration.name,
+            declaration.name ?: "<init>", // What about "<clinit>"?
             declaration.signature.descriptor,
             null,  //declaration.signature.signature,   // TODO: When to add signature?
             declaration.signature.throwableTypes.map(JvmType::descriptor).toTypedArray()
@@ -62,7 +62,7 @@ class JvmClassBuilder internal constructor(
     fun createMethod(
         name: String?,
         signature: JvmMethodSignature,
-        modifiers: JvmMethodModifiers,
+        modifiers: JvmMethodModifiers = JvmMethodModifiers.None,
     ): JvmMethodBuilder = createMethod(JvmMethodDecl(name, declaration, signature, modifiers))
 
     /**
@@ -86,7 +86,7 @@ class JvmClassBuilder internal constructor(
         parameters: List<JvmParam> = emptyList(),
         typeParameters: List<JvmTypeParam> = emptyList(),
         throwableTypes: List<JvmType> = emptyList(),
-        modifiers: JvmMethodModifiers,
+        modifiers: JvmMethodModifiers = JvmMethodModifiers.None,
     ): JvmMethodBuilder = createMethod(
         name,
         JvmMethodSignature(returnType, parameters, typeParameters, throwableTypes),
@@ -195,7 +195,7 @@ class JvmClassBuilder internal constructor(
                     ).ref(JvmTypes.Object.ref())
                 )
                 ret()
-            }
+            }.build()
         }.build()
     }
 

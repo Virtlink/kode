@@ -1,6 +1,7 @@
 package dev.pelsmaeker.kode.types
 
 import dev.pelsmaeker.kode.JvmParam
+import dev.pelsmaeker.kode.types.JvmMethodRef.Companion.ref
 import java.lang.reflect.Constructor
 import java.lang.reflect.Executable
 import java.lang.reflect.Method
@@ -25,11 +26,10 @@ class JvmMethodRef(
     override val isInstance: Boolean = false,
 ) : JvmMemberRef {
 
-    override val debugName: String get() = name ?: if (isInstance) "<init>" else "<clinit>"
+    override val debugName: String get() = javaName
     // FIXME: This is probably incorrect:
     override val internalName: String get() = if (isConstructor) "${owner.internalName}#${owner.name}(..)" else "${owner.internalName}#$name(..)"
-    // FIXME: This is probably incorrect:
-    override val javaName: String get() = if (isConstructor) "${owner.javaName}#${owner.name}(..)" else "${owner.javaName}#$name(..)"
+    override val javaName: String get() = name ?: if (isInstance) "<init>" else "<clinit>"
 
     override val isStatic: Boolean get() = !isInstance
     override val isConstructor: Boolean get() = name == null
@@ -121,6 +121,20 @@ class JvmMethodRef(
                 parameters,
                 isInstance,
             )
+        }
+
+        /**
+         * Gets the Java Reflection [Method] that corresponds to the given JVM method reference.
+         *
+         * @param ref the JVM method reference
+         * @return the corresponding Java Reflection [Method]
+         * @throws NoSuchMethodException if the method is not found
+         * @throws SecurityException if the action is not permitted
+         */
+        @Throws(NoSuchMethodException::class, SecurityException::class)
+        fun <T> Class<T>.getMethod(ref: JvmMethodRef): Method {
+            // FIXME: This will error if one of the parameters is not a Class<*> type (e.g., a type variable).
+            return this.getMethod(ref.javaName, *ref.parameters.map { it.type.toJavaType() as Class<*> }.toTypedArray())
         }
     }
 }

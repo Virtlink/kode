@@ -1,6 +1,7 @@
 package dev.pelsmaeker.kode.types
 
 import dev.pelsmaeker.kode.types.*
+import dev.pelsmaeker.kode.types.JvmType.Companion.of
 import java.lang.reflect.*
 
 
@@ -37,6 +38,12 @@ interface JvmType {
 
     /** Whether this is a type variable. */
     val isTypeVariable: Boolean
+
+    /**
+     * Constructs an equivalent Java Reflect type.
+     * @return the constructed [Type]
+     */
+    fun toJavaType(classLoader: ClassLoader? = null): Type
 
     companion object {
         /**

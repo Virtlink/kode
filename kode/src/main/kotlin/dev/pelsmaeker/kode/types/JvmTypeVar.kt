@@ -1,5 +1,6 @@
 package dev.pelsmaeker.kode.types
 
+import java.lang.reflect.Type
 import java.lang.reflect.TypeVariable
 
 /**
@@ -26,6 +27,8 @@ data class JvmTypeVar(
     override val isInterface: Boolean get() = false
     override val isArray: Boolean get() = false
     override val isTypeVariable: Boolean get() = true
+
+    override fun toJavaType(classLoader: ClassLoader?): Type = TODO("Not supported yet.")
 
     override fun toString(): String = name
 
