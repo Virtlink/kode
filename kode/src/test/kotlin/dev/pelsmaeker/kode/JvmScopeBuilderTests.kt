@@ -116,11 +116,11 @@ class JvmScopeBuilderTests {
             load(f)
             load(d)
             load(o)
-            pop()
+            pop1()
             pop2()
-            pop()
+            pop1()
             pop2()
-            pop()
+            pop1()
             ret()
         }
 

@@ -20,9 +20,9 @@ enum class JvmTypeKind {
     /** Object type. */
     Object;
 
-    /** The number of stack slots occupied by this kind of type. */
-    val slotCount: Int get() = when (this) {
-        Void -> 0 // FIXME: Not sure about this one
+    /** The category of this kind of type, which is the number of stack slots this type occupies. */
+    val category: Int get() = when (this) {
+        Void -> 0 // A primitive void is never on the stack.
         Integer, Float, Object -> 1
         Long, Double -> 2
     }

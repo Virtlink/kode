@@ -291,7 +291,7 @@ class JvmVars(
      */
     private fun getFreshVarOffset(type: JvmType): Int {
         val index = nextVarOffset
-        nextVarOffset += type.kind.slotCount
+        nextVarOffset += type.kind.category
         return index
     }
 

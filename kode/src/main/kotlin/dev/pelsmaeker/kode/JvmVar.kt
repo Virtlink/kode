@@ -18,7 +18,7 @@ data class JvmVar(
      *
      * The offset need not match the index, for example if there are preceding category 2 variables
      * (those that take up two slots, such as variables of type Long and Double).
-     * See also [JvmTypeKind.slotCount].
+     * See also [JvmTypeKind.category].
      */
     val offset: Int,
 ) {

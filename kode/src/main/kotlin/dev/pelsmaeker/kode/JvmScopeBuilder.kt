@@ -103,9 +103,9 @@ class JvmScopeBuilder(
         )
     }
 
-    //////////////////////////
-    // LOAD LOCAL VARIABLES //
-    //////////////////////////
+    //////////
+    // LOAD //
+    //////////
 
     /**
      * Load an `int` value from a local variable on top of the stack.
@@ -177,9 +177,9 @@ class JvmScopeBuilder(
         }
     }
 
-    ///////////////////////////
-    // STORE LOCAL VARIABLES //
-    ///////////////////////////
+    ///////////
+    // STORE //
+    ///////////
 
     /**
      * Store the `int` on top of the stack into a local variable.
@@ -270,7 +270,7 @@ class JvmScopeBuilder(
     ///////////
 
     /** Pop the top value from the stack. */
-    fun pop() {
+    fun pop1() {
         methodBuilder.methodVisitor.visitInsn(Opcodes.POP)
     }
 
@@ -279,24 +279,26 @@ class JvmScopeBuilder(
         methodBuilder.methodVisitor.visitInsn(Opcodes.POP2)
     }
 
+    /** Pops a value of the specified type from the stack. */
+    fun pop(type: JvmType) = pop(type.kind)
+
+    /** Pops a value of the specified kind from the stack. */
+    fun pop(kind: JvmTypeKind) {
+        when (kind.category) {
+            1 -> pop1()
+            2 -> pop2()
+            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
+        }
+    }
+
     /** Swap the top two values on the stack. */
     fun swap() {
         methodBuilder.methodVisitor.visitInsn(Opcodes.SWAP)
     }
 
     /** Duplicate the top value on the stack. */
-    fun dup() {
+    fun dup1() {
         methodBuilder.methodVisitor.visitInsn(Opcodes.DUP)
-    }
-
-    /** Duplicate the top value up to two values below the top of the stack. */
-    fun dup_x1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X1)
-    }
-
-    /** Duplicate the top value up to three values below the top of the stack. */
-    fun dup_x2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X2)
     }
 
     /** Duplicate the top two values on the stack. */
@@ -304,14 +306,60 @@ class JvmScopeBuilder(
         methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2)
     }
 
-    /** Duplicate the up to two top values up to three values below the top of the stack. */
+    /** Duplicate a value of the specified type on the stack. */
+    fun dup(type: JvmType) = dup(type.kind)
+
+    /** Duplicate a value of the specified kind on the stack. */
+    fun dup(kind: JvmTypeKind) {
+        when (kind.category) {
+            1 -> dup1()
+            2 -> dup2()
+            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
+        }
+    }
+
+    /** Duplicate the top value up to two values below the top of the stack. */
+    fun dup1_x1() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X1)
+    }
+
+    /** Duplicate the two top values up to three values below the top of the stack. */
     fun dup2_x1() {
         methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2_X1)
+    }
+
+    /** Duplicate a value of the specified type lower on the stack. */
+    fun dup_x1(type: JvmType) = dup(type.kind)
+
+    /** Duplicate a value of the specified kind lower on the stack. */
+    fun dup_x1(kind: JvmTypeKind) {
+        when (kind.category) {
+            1 -> dup1_x1()
+            2 -> dup2_x1()
+            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
+        }
+    }
+
+    /** Duplicate the top value up to three values below the top of the stack. */
+    fun dup1_x2() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X2)
     }
 
     /** Duplicate the up to two top values up to four values below the top of the stack. */
     fun dup2_x2() {
         methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2_X2)
+    }
+
+    /** Duplicate a value of the specified type lower on the stack. */
+    fun dup_x2(type: JvmType) = dup(type.kind)
+
+    /** Duplicate a value of the specified kind lower on the stack. */
+    fun dup_x2(kind: JvmTypeKind) {
+        when (kind.category) {
+            1 -> dup1_x2()
+            2 -> dup2_x2()
+            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
+        }
     }
 
     ///////////////
@@ -353,46 +401,6 @@ class JvmScopeBuilder(
         methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_5)
     }
 
-    /** Push constant long integer 0 on the stack. */
-    fun lConst_0() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_0)
-    }
-
-    /** Push constant long integer 1 on the stack. */
-    fun lConst_1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_1)
-    }
-
-    /** Push constant float 0 on the stack. */
-    fun fConst_0() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_0)
-    }
-
-    /** Push constant float 1 on the stack. */
-    fun fConst_1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_1)
-    }
-
-    /** Push constant float 2 on the stack. */
-    fun fConst_2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_2)
-    }
-
-    /** Push constant double 0 on the stack. */
-    fun dConst_0() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_0)
-    }
-
-    /** Push constant double 1 on the stack. */
-    fun dConst_1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_1)
-    }
-
-    /** Push constant null on the stack. */
-    fun aConst_Null() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ACONST_NULL)
-    }
-
     /**
      * Push a constant `int` on the stack.
      *
@@ -419,6 +427,17 @@ class JvmScopeBuilder(
         }
     }
 
+
+    /** Push constant long integer 0 on the stack. */
+    fun lConst_0() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_0)
+    }
+
+    /** Push constant long integer 1 on the stack. */
+    fun lConst_1() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_1)
+    }
+
     /**
      * Push a constant `long` on the stack.
      *
@@ -432,6 +451,21 @@ class JvmScopeBuilder(
             1L -> lConst_1()
             else -> ldc(java.lang.Long.valueOf(value))
         }
+    }
+
+    /** Push constant float 0 on the stack. */
+    fun fConst_0() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_0)
+    }
+
+    /** Push constant float 1 on the stack. */
+    fun fConst_1() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_1)
+    }
+
+    /** Push constant float 2 on the stack. */
+    fun fConst_2() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_2)
     }
 
     /**
@@ -450,6 +484,16 @@ class JvmScopeBuilder(
         }
     }
 
+    /** Push constant double 0 on the stack. */
+    fun dConst_0() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_0)
+    }
+
+    /** Push constant double 1 on the stack. */
+    fun dConst_1() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_1)
+    }
+
     /**
      * Push a constant `double` on the stack.
      *
@@ -457,11 +501,11 @@ class JvmScopeBuilder(
      *
      * @param value the constant `double` value
      */
-    fun dConst(value: Float) {
-        when {
-            value.toDouble() == 0.0 -> dConst_0()
-            value.toDouble() == 1.0 -> dConst_1()
-            else -> ldc(java.lang.Double.valueOf(value.toDouble()))
+    fun dConst(value: Double) {
+        when(value) {
+            0.0 -> dConst_0()
+            1.0 -> dConst_1()
+            else -> ldc(java.lang.Double.valueOf(value))
         }
     }
 
@@ -483,6 +527,11 @@ class JvmScopeBuilder(
         methodBuilder.methodVisitor.visitIntInsn(Opcodes.SIPUSH, value.toInt())
     }
 
+    /** Push constant null on the stack. */
+    fun aConst_Null() {
+        methodBuilder.methodVisitor.visitInsn(Opcodes.ACONST_NULL)
+    }
+
     /**
      * Push a loaded constant on the stack.
      *
@@ -492,6 +541,30 @@ class JvmScopeBuilder(
         val a: Any = if (value is JvmType) Type.getType(value.descriptor) else value
         methodBuilder.methodVisitor.visitLdcInsn(a)
     }
+
+    // ldc_w
+    // ldc2_w
+
+    /**
+     * Push a constant value on the stack.
+     *
+     * This method picks the most efficient instruction for the given constant.
+     *
+     * @param value the constant value, which may be `null`
+     */
+    fun const(value: Any?) {
+        when (value) {
+            is Byte -> biPush(value)
+            is Short -> siPush(value)
+            is Int -> iConst(value)
+            is Long -> lConst(value)
+            is Float -> fConst(value)
+            is Double -> dConst(value)
+            null -> aConst_Null()
+            else -> ldc(value)
+        }
+    }
+
     //////////////////////////
     // ARITHMETIC and LOGIC //
     //////////////////////////
