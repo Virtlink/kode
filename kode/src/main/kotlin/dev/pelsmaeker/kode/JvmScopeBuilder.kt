@@ -3,7 +3,6 @@ package dev.pelsmaeker.kode
 import dev.pelsmaeker.kode.utils.Scoped
 import dev.pelsmaeker.kode.types.*
 import dev.pelsmaeker.kode.utils.Eponymizer
-import dev.pelsmaeker.kode.utils.requireIsJvmType
 import org.objectweb.asm.Type
 import org.objectweb.asm.Opcodes
 
