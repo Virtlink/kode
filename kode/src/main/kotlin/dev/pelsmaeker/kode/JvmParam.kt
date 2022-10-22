@@ -3,7 +3,6 @@ package dev.pelsmaeker.kode
 import dev.pelsmaeker.kode.types.JvmType
 import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
-import java.util.*
 
 /**
  * A method's parameter.
@@ -67,7 +66,7 @@ data class JvmParam(
          * @param modifiers the modifiers on the parameter
          * @return the resulting [JvmParam]
          */
-        fun fromLocalVar(localVar: JvmLocalVar, modifiers: JvmParamModifiers = JvmParamModifiers.None): JvmParam {
+        fun fromLocalVar(localVar: JvmVar, modifiers: JvmParamModifiers = JvmParamModifiers.None): JvmParam {
             return JvmParam(localVar.type, localVar.name, modifiers)
         }
 
@@ -97,7 +96,7 @@ data class JvmParam(
          * @param localVars the local variables
          * @return the resulting list of [JvmParam]
          */
-        fun fromLocalVars(vararg localVars: JvmLocalVar): List<JvmParam> {
+        fun fromLocalVars(vararg localVars: JvmVar): List<JvmParam> {
             return fromLocalVars(localVars.toList())
         }
 
@@ -108,7 +107,7 @@ data class JvmParam(
          * @param localVars the local variables
          * @return the resulting list of [JvmParam]
          */
-        fun fromLocalVars(modifiers: JvmParamModifiers, vararg localVars: JvmLocalVar): List<JvmParam> {
+        fun fromLocalVars(modifiers: JvmParamModifiers, vararg localVars: JvmVar): List<JvmParam> {
             return fromLocalVars(modifiers, localVars.toList())
         }
 
@@ -118,7 +117,7 @@ data class JvmParam(
          * @param localVars the local variables
          * @return the resulting list of [JvmParam]
          */
-        fun fromLocalVars(localVars: Iterable<JvmLocalVar>): List<JvmParam> {
+        fun fromLocalVars(localVars: Iterable<JvmVar>): List<JvmParam> {
             return fromLocalVars(JvmParamModifiers.None, localVars)
         }
 
@@ -129,7 +128,7 @@ data class JvmParam(
          * @param localVars the local variables
          * @return the resulting list of [JvmParam]
          */
-        fun fromLocalVars(modifiers: JvmParamModifiers = JvmParamModifiers.None, localVars: Iterable<JvmLocalVar>): List<JvmParam> {
+        fun fromLocalVars(modifiers: JvmParamModifiers = JvmParamModifiers.None, localVars: Iterable<JvmVar>): List<JvmParam> {
             return localVars.map { fromLocalVar(it) }
         }
     }

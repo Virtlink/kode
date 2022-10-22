@@ -2,7 +2,6 @@ package dev.pelsmaeker.kode
 
 
 import dev.pelsmaeker.kode.types.JvmMethodDecl
-import dev.pelsmaeker.kode.types.JvmMethodRef
 import dev.pelsmaeker.kode.utils.Eponymizer
 import org.objectweb.asm.MethodVisitor
 
@@ -26,8 +25,8 @@ class JvmMethodBuilder internal constructor(
     val eponymizer: Eponymizer,
 ): AutoCloseable {
 
-    /** A list of local variables declared anywhere in the method's body. */
-    internal val declaredLocalVars: MutableList<JvmLocalVar> = mutableListOf()
+    /** A list of variables declared anywhere in the method's body. */
+    internal val declaredVars: MutableList<JvmVar> = mutableListOf()
 
     /** The scope for the method's body instructions; or `null` when not yet set. */
     private var bodyScope: JvmScopeBuilder? = null
@@ -47,24 +46,24 @@ class JvmMethodBuilder internal constructor(
         methodVisitor.visitCode()
         val jvmScopeBuilder = JvmScopeBuilder(this, eponymizer = eponymizer.scope("(body)"))
         bodyScope = jvmScopeBuilder
-        initializeLocalVars(jvmScopeBuilder.localVars)
+        initializeVars(jvmScopeBuilder.vars)
         return jvmScopeBuilder
     }
 
     /**
-     * Initializes the local variables for this method's body by adding the 'this' reference (if any),
+     * Initializes the variables for this method's body by adding the 'this' reference (if any),
      * and the method's arguments.
      *
-     * @param localVars the local variables to initialize
+     * @param vars the variables to initialize
      */
-    private fun initializeLocalVars(localVars: JvmLocalVars) {
+    private fun initializeVars(vars: JvmVars) {
         // Add `this` reference.
         if (declaration.isInstance) {
-            localVars.addThis(classBuilder.declaration.ref() /* FIXME: Not sure this is correct when the type is parameterized. */)
+            vars.addThis(classBuilder.declaration.ref() /* FIXME: Not sure this is correct when the type is parameterized. */)
         }
         // Add the arguments in the order they are defined.
         for (parameter in declaration.signature.parameters) {
-            localVars.addArgument(parameter)
+            vars.addArgument(parameter)
         }
     }
 
@@ -75,15 +74,15 @@ class JvmMethodBuilder internal constructor(
         closed = true
 
         // Add the local variables that have a name
-        for (localVar in declaredLocalVars) {
-            if (localVar.name == null) continue
+        for (v in declaredVars) {
+            if (v.name == null) continue
             methodVisitor.visitLocalVariable(
-                localVar.name,
-                localVar.type.descriptor,
-                null,  // TODO: When to add a signature? When it has a type argument? localVar.getType().getSignature()
-                localVar.scope.startLabel.internalLabel,
-                localVar.scope.endLabel.internalLabel,
-                localVar.offset
+                v.name,
+                v.type.descriptor,
+                null,  // TODO: When to add a signature? When it has a type argument? v.getType().getSignature()
+                v.scope.startLabel.internalLabel,
+                v.scope.endLabel.internalLabel,
+                v.offset
             )
         }
 

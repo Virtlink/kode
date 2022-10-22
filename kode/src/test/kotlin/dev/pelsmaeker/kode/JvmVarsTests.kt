@@ -5,18 +5,18 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-/** Tests the [JvmLocalVars] class. */
-class JvmLocalVarsTests {
+/** Tests the [JvmVars] class. */
+class JvmVarsTests {
 
     @Test
     fun `addThis() should add the implicit 'this' argument`() {
         // Arrange
         val scope = JvmSimpleScope()
         val thisType = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
+        val vars = JvmVars(scope)
 
         // Act
-        val v = localVars.addThis(thisType)
+        val v = vars.addThis(thisType)
 
         // Assert
         assertEquals(thisType, v.type)
@@ -29,12 +29,12 @@ class JvmLocalVarsTests {
     fun `addThis() should throw, when called twice`() {
         // Arrange
         val thisType = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(JvmSimpleScope())
-        localVars.addThis(thisType)
+        val vars = JvmVars(JvmSimpleScope())
+        vars.addThis(thisType)
 
         // Act/Assert
         assertThrows<IllegalStateException> {
-            localVars.addThis(thisType)
+            vars.addThis(thisType)
         }
     }
 
@@ -42,12 +42,12 @@ class JvmLocalVarsTests {
     fun `addThis() should throw, when other arguments are already present`() {
         // Arrange
         val thisType = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(JvmSimpleScope())
-        localVars.addArgument(JvmParam(JvmInteger))
+        val vars = JvmVars(JvmSimpleScope())
+        vars.addArgument(JvmParam(JvmInteger))
 
         // Act/Assert
         assertThrows<IllegalStateException> {
-            localVars.addThis(thisType)
+            vars.addThis(thisType)
         }
     }
 
@@ -55,12 +55,12 @@ class JvmLocalVarsTests {
     fun `addThis() should throw, when other variables are already present`() {
         // Arrange
         val thisType = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(JvmSimpleScope())
-        localVars.addLocalVar(JvmInteger)
+        val vars = JvmVars(JvmSimpleScope())
+        vars.addLocalVar(JvmInteger)
 
         // Act/Assert
         assertThrows<IllegalStateException> {
-            localVars.addThis(thisType)
+            vars.addThis(thisType)
         }
     }
 
@@ -68,13 +68,13 @@ class JvmLocalVarsTests {
     fun `addThis() should throw, when 'this' is already present from a parent`() {
         // Arrange
         val thisType = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addThis(thisType)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addThis(thisType)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act/Assert
         assertThrows<IllegalStateException> {
-            localVars.addThis(thisType)
+            vars.addThis(thisType)
         }
     }
 
@@ -82,13 +82,13 @@ class JvmLocalVarsTests {
     fun `addThis() should throw, when other arguments and variables are already present from a parent`() {
         // Arrange
         val thisType = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addLocalVar(JvmInteger)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addLocalVar(JvmInteger)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act/Assert
         assertThrows<IllegalStateException> {
-            localVars.addThis(thisType)
+            vars.addThis(thisType)
         }
     }
 
@@ -98,10 +98,10 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
+        val vars = JvmVars(scope)
 
         // Act
-        val v = localVars.addArgument(JvmParam(type, name))
+        val v = vars.addArgument(JvmParam(type, name))
 
         // Assert
         assertEquals(type, v.type)
@@ -115,10 +115,10 @@ class JvmLocalVarsTests {
         // Arrange
         val scope = JvmSimpleScope()
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
+        val vars = JvmVars(scope)
 
         // Act
-        val v = localVars.addArgument(JvmParam(type))
+        val v = vars.addArgument(JvmParam(type))
 
         // Assert
         assertEquals(type, v.type)
@@ -133,11 +133,11 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
 
         // Act
-        val v = localVars.addArgument(JvmParam(type, name))
+        val v = vars.addArgument(JvmParam(type, name))
 
         // Assert
         assertEquals(type, v.type)
@@ -152,12 +152,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmShort))
+        val vars = JvmVars(scope)
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmShort))
 
         // Act
-        val v = localVars.addArgument(JvmParam(type, name))
+        val v = vars.addArgument(JvmParam(type, name))
 
         // Assert
         assertEquals(type, v.type)
@@ -172,13 +172,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmShort))
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmShort))
 
         // Act
-        val v = localVars.addArgument(JvmParam(type, name))
+        val v = vars.addArgument(JvmParam(type, name))
 
         // Assert
         assertEquals(type, v.type)
@@ -193,13 +193,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addArgument(JvmParam(JvmLong))        // 2 slots
-        localVars.addArgument(JvmParam(JvmShort))
-        localVars.addArgument(JvmParam(JvmDouble))      // 2 slots
+        val vars = JvmVars(scope)
+        vars.addArgument(JvmParam(JvmLong))        // 2 slots
+        vars.addArgument(JvmParam(JvmShort))
+        vars.addArgument(JvmParam(JvmDouble))      // 2 slots
 
         // Act
-        val v = localVars.addArgument(JvmParam(type, name))
+        val v = vars.addArgument(JvmParam(type, name))
 
         // Assert
         assertEquals(type, v.type)
@@ -214,12 +214,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addArgument(JvmParam(JvmInteger))
-        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addArgument(JvmParam(JvmInteger))
+        val vars = JvmVars(scope, parent = parentVars)
 
         // Act
-        val v = localVars.addArgument(JvmParam(type, name))
+        val v = vars.addArgument(JvmParam(type, name))
 
         // Assert
         assertEquals(type, v.type)
@@ -234,12 +234,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addThis(JvmTypes.Object.ref())
-        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addThis(JvmTypes.Object.ref())
+        val vars = JvmVars(scope, parent = parentVars)
 
         // Act
-        val v = localVars.addArgument(JvmParam(type, name))
+        val v = vars.addArgument(JvmParam(type, name))
 
         // Assert
         assertEquals(type, v.type)
@@ -253,12 +253,12 @@ class JvmLocalVarsTests {
         // Arrange
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(JvmSimpleScope())
-        localVars.addLocalVar(JvmInteger)
+        val vars = JvmVars(JvmSimpleScope())
+        vars.addLocalVar(JvmInteger)
 
         // Act/Assert
         assertThrows<IllegalStateException> {
-            localVars.addArgument(JvmParam(type, name))
+            vars.addArgument(JvmParam(type, name))
         }
     }
 
@@ -267,13 +267,13 @@ class JvmLocalVarsTests {
         // Arrange
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addLocalVar(JvmInteger)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addLocalVar(JvmInteger)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act/Assert
         assertThrows<IllegalStateException> {
-            localVars.addArgument(JvmParam(type, name))
+            vars.addArgument(JvmParam(type, name))
         }
     }
 
@@ -282,12 +282,12 @@ class JvmLocalVarsTests {
         // Arrange
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(JvmSimpleScope())
-        localVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(JvmSimpleScope())
+        vars.addArgument(JvmParam(type, name))
 
         // Act/Assert
         assertThrows<IllegalArgumentException> {
-            localVars.addArgument(JvmParam(type, name))
+            vars.addArgument(JvmParam(type, name))
         }
     }
 
@@ -297,10 +297,10 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
+        val vars = JvmVars(scope)
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -314,10 +314,10 @@ class JvmLocalVarsTests {
         // Arrange
         val scope = JvmSimpleScope()
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
+        val vars = JvmVars(scope)
 
         // Act
-        val v = localVars.addLocalVar(type)
+        val v = vars.addLocalVar(type)
 
         // Assert
         assertEquals(type, v.type)
@@ -332,11 +332,11 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -351,12 +351,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmShort))
+        val vars = JvmVars(scope)
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmShort))
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -371,12 +371,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addLocalVar(JvmInteger)
-        localVars.addLocalVar(JvmShort)
+        val vars = JvmVars(scope)
+        vars.addLocalVar(JvmInteger)
+        vars.addLocalVar(JvmShort)
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -391,13 +391,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmShort))
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmShort))
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -412,14 +412,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmShort))
-        localVars.addLocalVar(JvmByte)
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmShort))
+        vars.addLocalVar(JvmByte)
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -434,13 +434,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addLocalVar(JvmLong)        // 2 slots
-        localVars.addLocalVar(JvmShort)
-        localVars.addLocalVar(JvmDouble)      // 2 slots
+        val vars = JvmVars(scope)
+        vars.addLocalVar(JvmLong)        // 2 slots
+        vars.addLocalVar(JvmShort)
+        vars.addLocalVar(JvmDouble)      // 2 slots
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -455,12 +455,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addLocalVar(JvmInteger)
-        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addLocalVar(JvmInteger)
+        val vars = JvmVars(scope, parent = parentVars)
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -475,12 +475,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addThis(JvmTypes.Object.ref())
-        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addThis(JvmTypes.Object.ref())
+        val vars = JvmVars(scope, parent = parentVars)
 
         // Act
-        val v = localVars.addLocalVar(type, name)
+        val v = vars.addLocalVar(type, name)
 
         // Assert
         assertEquals(type, v.type)
@@ -494,12 +494,12 @@ class JvmLocalVarsTests {
         // Arrange
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(JvmSimpleScope())
-        localVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(JvmSimpleScope())
+        vars.addArgument(JvmParam(type, name))
 
         // Act/Assert
         assertThrows<IllegalArgumentException> {
-            localVars.addLocalVar(type, name)
+            vars.addLocalVar(type, name)
         }
     }
 
@@ -508,12 +508,12 @@ class JvmLocalVarsTests {
         // Arrange
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(JvmSimpleScope())
-        localVars.addLocalVar(type, name)
+        val vars = JvmVars(JvmSimpleScope())
+        vars.addLocalVar(type, name)
 
         // Act/Assert
         assertThrows<IllegalArgumentException> {
-            localVars.addLocalVar(type, name)
+            vars.addLocalVar(type, name)
         }
     }
 
@@ -522,11 +522,11 @@ class JvmLocalVarsTests {
         // Arrange
         val scope = JvmSimpleScope()
         val thisType = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(thisType)
+        val vars = JvmVars(scope)
+        vars.addThis(thisType)
 
         // Act
-        val v = localVars.getThis()!!
+        val v = vars.getThis()!!
 
         // Assert
         assertEquals(thisType, v.type)
@@ -540,12 +540,12 @@ class JvmLocalVarsTests {
         // Arrange
         val scope = JvmSimpleScope()
         val thisType = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addThis(thisType)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addThis(thisType)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val v = localVars.getThis()!!
+        val v = vars.getThis()!!
 
         // Assert
         assertEquals(thisType, v.type)
@@ -557,10 +557,10 @@ class JvmLocalVarsTests {
     @Test
     fun `getThis() should return false, when it has not been set`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
-        val v = localVars.getThis()
+        val v = vars.getThis()
 
         // Assert
         assertNull(v)
@@ -572,13 +572,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmLong))
-        localVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(scope)
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmLong))
+        vars.addArgument(JvmParam(type, name))
 
         // Act
-        val v = localVars.getArgument(name)!!
+        val v = vars.getArgument(name)!!
 
         // Assert
         assertEquals(type, v.type)
@@ -593,14 +593,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addArgument(JvmParam(JvmInteger))
-        parentLocalVars.addArgument(JvmParam(JvmLong))
-        parentLocalVars.addArgument(JvmParam(type, name))
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addArgument(JvmParam(JvmInteger))
+        parentVars.addArgument(JvmParam(JvmLong))
+        parentVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val v = localVars.getArgument(name)!!
+        val v = vars.getArgument(name)!!
 
         // Assert
         assertEquals(type, v.type)
@@ -612,10 +612,10 @@ class JvmLocalVarsTests {
     @Test
     fun `getArgument(String) should return null, when it has not been added`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
-        val v = localVars.getArgument("myArg")
+        val v = vars.getArgument("myArg")
 
         // Assert
         assertNull(v)
@@ -627,13 +627,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmLong))
-        localVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(scope)
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmLong))
+        vars.addArgument(JvmParam(type, name))
 
         // Act
-        val v = localVars.getArgument(2)
+        val v = vars.getArgument(2)
 
         // Assert
         assertEquals(type, v.type)
@@ -648,14 +648,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addArgument(JvmParam(JvmInteger))
-        parentLocalVars.addArgument(JvmParam(JvmLong))
-        parentLocalVars.addArgument(JvmParam(type, name))
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addArgument(JvmParam(JvmInteger))
+        parentVars.addArgument(JvmParam(JvmLong))
+        parentVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val v = localVars.getArgument(2)
+        val v = vars.getArgument(2)
 
         // Assert
         assertEquals(type, v.type)
@@ -670,14 +670,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addArgument(JvmParam(JvmInteger))
-        parentLocalVars.addArgument(JvmParam(JvmLong))
-        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
-        localVars.addArgument(JvmParam(type, name))
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addArgument(JvmParam(JvmInteger))
+        parentVars.addArgument(JvmParam(JvmLong))
+        val vars = JvmVars(scope, parent = parentVars)
+        vars.addArgument(JvmParam(type, name))
 
         // Act
-        val v = localVars.getArgument(2)
+        val v = vars.getArgument(2)
 
         // Assert
         assertEquals(type, v.type)
@@ -692,12 +692,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
-        localVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
+        vars.addArgument(JvmParam(type, name))
 
         // Act
-        val v = localVars.getArgument(0)
+        val v = vars.getArgument(0)
 
         // Assert
         assertEquals(type, v.type)
@@ -709,11 +709,11 @@ class JvmLocalVarsTests {
     @Test
     fun `getArgument(Int) should throw, when it has not been added`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
         assertThrows<IllegalArgumentException> {
-            localVars.getArgument(2)
+            vars.getArgument(2)
         }
     }
 
@@ -723,13 +723,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addLocalVar(JvmInteger)
-        localVars.addLocalVar(JvmLong)
-        localVars.addLocalVar(type, name)
+        val vars = JvmVars(scope)
+        vars.addLocalVar(JvmInteger)
+        vars.addLocalVar(JvmLong)
+        vars.addLocalVar(type, name)
 
         // Act
-        val v = localVars.getLocalVar(name)!!
+        val v = vars.getLocalVar(name)!!
 
         // Assert
         assertEquals(type, v.type)
@@ -744,14 +744,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addLocalVar(JvmInteger)
-        parentLocalVars.addLocalVar(JvmLong)
-        parentLocalVars.addLocalVar(type, name)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addLocalVar(JvmInteger)
+        parentVars.addLocalVar(JvmLong)
+        parentVars.addLocalVar(type, name)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val v = localVars.getLocalVar(name)!!
+        val v = vars.getLocalVar(name)!!
 
         // Assert
         assertEquals(type, v.type)
@@ -763,10 +763,10 @@ class JvmLocalVarsTests {
     @Test
     fun `getLocalVar(String) should return null, when it has not been added`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
-        val v = localVars.getLocalVar("myVar")
+        val v = vars.getLocalVar("myVar")
 
         // Assert
         assertNull(v)
@@ -778,13 +778,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addLocalVar(JvmInteger)
-        localVars.addLocalVar(JvmLong)
-        localVars.addLocalVar(type, name)
+        val vars = JvmVars(scope)
+        vars.addLocalVar(JvmInteger)
+        vars.addLocalVar(JvmLong)
+        vars.addLocalVar(type, name)
 
         // Act
-        val v = localVars.getLocalVar(2)
+        val v = vars.getLocalVar(2)
 
         // Assert
         assertEquals(type, v.type)
@@ -799,14 +799,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addLocalVar(JvmInteger)
-        parentLocalVars.addLocalVar(JvmLong)
-        parentLocalVars.addLocalVar(type, name)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addLocalVar(JvmInteger)
+        parentVars.addLocalVar(JvmLong)
+        parentVars.addLocalVar(type, name)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val v = localVars.getLocalVar(2)
+        val v = vars.getLocalVar(2)
 
         // Assert
         assertEquals(type, v.type)
@@ -821,14 +821,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
-        parentLocalVars.addLocalVar(JvmInteger)
-        parentLocalVars.addLocalVar(JvmLong)
-        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
-        localVars.addLocalVar(type, name)
+        val parentVars = JvmVars(JvmSimpleScope())
+        parentVars.addLocalVar(JvmInteger)
+        parentVars.addLocalVar(JvmLong)
+        val vars = JvmVars(scope, parent = parentVars)
+        vars.addLocalVar(type, name)
 
         // Act
-        val v = localVars.getLocalVar(2)
+        val v = vars.getLocalVar(2)
 
         // Assert
         assertEquals(type, v.type)
@@ -843,12 +843,12 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
-        localVars.addLocalVar(type, name)
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
+        vars.addLocalVar(type, name)
 
         // Act
-        val v = localVars.getLocalVar(0)
+        val v = vars.getLocalVar(0)
 
         // Assert
         assertEquals(type, v.type)
@@ -863,14 +863,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(JvmTypes.Object.ref())
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmLong))
-        localVars.addLocalVar(type, name)
+        val vars = JvmVars(scope)
+        vars.addThis(JvmTypes.Object.ref())
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmLong))
+        vars.addLocalVar(type, name)
 
         // Act
-        val v = localVars.getLocalVar(0)
+        val v = vars.getLocalVar(0)
 
         // Assert
         assertEquals(type, v.type)
@@ -882,11 +882,11 @@ class JvmLocalVarsTests {
     @Test
     fun `getLocalVar(Int) should throw, when it has not been added`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
         assertThrows<IllegalArgumentException> {
-            localVars.getLocalVar(2)
+            vars.getLocalVar(2)
         }
     }
 
@@ -895,11 +895,11 @@ class JvmLocalVarsTests {
         // Arrange
         val scope = JvmSimpleScope()
         val thisType = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addThis(thisType)
+        val vars = JvmVars(scope)
+        vars.addThis(thisType)
 
         // Act
-        val result = localVars.hasThis()
+        val result = vars.hasThis()
 
         // Assert
         assertTrue(result)
@@ -910,12 +910,12 @@ class JvmLocalVarsTests {
         // Arrange
         val scope = JvmSimpleScope()
         val thisType = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addThis(thisType)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addThis(thisType)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val result = localVars.hasThis()
+        val result = vars.hasThis()
 
         // Assert
         assertTrue(result)
@@ -924,10 +924,10 @@ class JvmLocalVarsTests {
     @Test
     fun `hasThis() should return false, when it has not been set`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
-        val result = localVars.hasThis()
+        val result = vars.hasThis()
 
         // Assert
         assertFalse(result)
@@ -939,13 +939,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addArgument(JvmParam(JvmInteger))
-        localVars.addArgument(JvmParam(JvmLong))
-        localVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(scope)
+        vars.addArgument(JvmParam(JvmInteger))
+        vars.addArgument(JvmParam(JvmLong))
+        vars.addArgument(JvmParam(type, name))
 
         // Act
-        val result = localVars.hasArgument(name)
+        val result = vars.hasArgument(name)
 
         // Assert
         assertTrue(result)
@@ -957,14 +957,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myArg"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addArgument(JvmParam(JvmInteger))
-        parentLocalVars.addArgument(JvmParam(JvmLong))
-        parentLocalVars.addArgument(JvmParam(type, name))
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addArgument(JvmParam(JvmInteger))
+        parentVars.addArgument(JvmParam(JvmLong))
+        parentVars.addArgument(JvmParam(type, name))
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val result = localVars.hasArgument(name)
+        val result = vars.hasArgument(name)
 
         // Assert
         assertTrue(result)
@@ -973,10 +973,10 @@ class JvmLocalVarsTests {
     @Test
     fun `hasArgument(String) should return false, when it has not been added`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
-        val result = localVars.hasArgument("myArg")
+        val result = vars.hasArgument("myArg")
 
         // Assert
         assertFalse(result)
@@ -988,13 +988,13 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val localVars = JvmLocalVars(scope)
-        localVars.addLocalVar(JvmInteger)
-        localVars.addLocalVar(JvmLong)
-        localVars.addLocalVar(type, name)
+        val vars = JvmVars(scope)
+        vars.addLocalVar(JvmInteger)
+        vars.addLocalVar(JvmLong)
+        vars.addLocalVar(type, name)
 
         // Act
-        val result = localVars.hasLocalVar(name)
+        val result = vars.hasLocalVar(name)
 
         // Assert
         assertTrue(result)
@@ -1006,14 +1006,14 @@ class JvmLocalVarsTests {
         val scope = JvmSimpleScope()
         val name = "myVar"
         val type = JvmClassRef.of(String::class.java)
-        val parentLocalVars = JvmLocalVars(scope)
-        parentLocalVars.addLocalVar(JvmInteger)
-        parentLocalVars.addLocalVar(JvmLong)
-        parentLocalVars.addLocalVar(type, name)
-        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+        val parentVars = JvmVars(scope)
+        parentVars.addLocalVar(JvmInteger)
+        parentVars.addLocalVar(JvmLong)
+        parentVars.addLocalVar(type, name)
+        val vars = JvmVars(JvmSimpleScope(), parent = parentVars)
 
         // Act
-        val result = localVars.hasLocalVar(name)
+        val result = vars.hasLocalVar(name)
 
         // Assert
         assertTrue(result)
@@ -1022,10 +1022,10 @@ class JvmLocalVarsTests {
     @Test
     fun `hasLocalVar(String) should return false, when it has not been added`() {
         // Arrange
-        val localVars = JvmLocalVars(JvmSimpleScope())
+        val vars = JvmVars(JvmSimpleScope())
 
         // Act
-        val result = localVars.hasLocalVar("myVar")
+        val result = vars.hasLocalVar("myVar")
 
         // Assert
         assertFalse(result)

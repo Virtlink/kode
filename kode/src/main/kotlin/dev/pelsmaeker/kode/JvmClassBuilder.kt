@@ -126,7 +126,7 @@ class JvmClassBuilder internal constructor(
         createMethod(declaration).use { methodBuilder ->
             methodBuilder.beginCode().use { body ->
                 // Load a reference to this instance onto the stack.
-                val _this: JvmLocalVar =
+                val _this: JvmVar =
                     body.localVar("this", this.declaration.ref() /* FIXME: Is this correct for parameterized types? */)
                 body.aLoad(_this)
 
@@ -182,7 +182,7 @@ class JvmClassBuilder internal constructor(
         }
         return createConstructor(emptyList(), modifiers).apply {
             beginCode().apply {
-                val `this`: JvmLocalVar = localVars.getThis()!!
+                val `this`: JvmVar = vars.getThis()!!
                 aLoad(`this`)
                 // This invokes the Object constructor
                 // FIXME: This should invoke the super constructor?
@@ -231,7 +231,7 @@ class JvmClassBuilder internal constructor(
     fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar> = emptyList(),
+        capturedVars: List<JvmVar> = emptyList(),
     ): JvmMethodBuilder {
         return createLambda(nameHint, signature, capturedVars, emptyArray())
     }
@@ -251,7 +251,7 @@ class JvmClassBuilder internal constructor(
     fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar> = emptyList(),
+        capturedVars: List<JvmVar> = emptyList(),
         thrownExceptionType: JvmType,
     ): JvmMethodBuilder {
         return createLambda(nameHint, signature, capturedVars, arrayOf(thrownExceptionType.descriptor))
@@ -272,7 +272,7 @@ class JvmClassBuilder internal constructor(
     fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar> = emptyList(),
+        capturedVars: List<JvmVar> = emptyList(),
         thrownExceptionTypes: List<JvmType> = emptyList(),
     ): JvmMethodBuilder {
         return createLambda(
@@ -298,7 +298,7 @@ class JvmClassBuilder internal constructor(
     private fun createLambda(
         nameHint: String,
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar> = emptyList(),
+        capturedVars: List<JvmVar> = emptyList(),
         thrownExceptionTypeDescriptors: Array<String> = emptyArray(),
     ): JvmMethodBuilder {
         // TODO: Do something with the thrown exception types
@@ -385,7 +385,7 @@ class JvmClassBuilder internal constructor(
      */
     private fun getLambdaSignature(
         signature: JvmMethodSignature,
-        capturedVars: List<JvmLocalVar>,
+        capturedVars: List<JvmVar>,
     ): JvmMethodSignature {
         val parameters: MutableList<JvmParam> = ArrayList()
         for (v in capturedVars) {

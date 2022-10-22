@@ -4,7 +4,6 @@ import dev.pelsmaeker.kode.types.*
 import dev.pelsmaeker.kode.types.JvmMethodRef.Companion.getMethod
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -17,7 +16,7 @@ class JvmScopeBuilderTests {
         // Arrange
         val value = 6
         val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger, listOf(JvmParam(JvmInteger, "a"))) {
-            val a = localVars.getArgument("a")!!
+            val a = vars.getArgument("a")!!
             iLoad(a)
             iReturn()
         }
@@ -34,7 +33,7 @@ class JvmScopeBuilderTests {
         // Arrange
         val value = 6L
         val (methodDecl, compiledClass) = buildEvalMethodWith(JvmLong, listOf(JvmParam(JvmLong, "a"))) {
-            val a = localVars.getArgument("a")!!
+            val a = vars.getArgument("a")!!
             lLoad(a)
             lReturn()
         }
@@ -51,7 +50,7 @@ class JvmScopeBuilderTests {
         // Arrange
         val value = 6.0f
         val (methodDecl, compiledClass) = buildEvalMethodWith(JvmFloat, listOf(JvmParam(JvmFloat, "a"))) {
-            val a = localVars.getArgument("a")!!
+            val a = vars.getArgument("a")!!
             fLoad(a)
             fReturn()
         }
@@ -68,7 +67,7 @@ class JvmScopeBuilderTests {
         // Arrange
         val value = 6.0
         val (methodDecl, compiledClass) = buildEvalMethodWith(JvmDouble, listOf(JvmParam(JvmDouble, "a"))) {
-            val a = localVars.getArgument("a")!!
+            val a = vars.getArgument("a")!!
             dLoad(a)
             dReturn()
         }
@@ -85,7 +84,7 @@ class JvmScopeBuilderTests {
         // Arrange
         val value = "My object"
         val (methodDecl, compiledClass) = buildEvalMethodWith(JvmTypes.Object.ref(), listOf(JvmParam(JvmTypes.Object.ref(), "a"))) {
-            val a = localVars.getArgument("a")!!
+            val a = vars.getArgument("a")!!
             aLoad(a)
             aReturn()
         }
@@ -107,11 +106,11 @@ class JvmScopeBuilderTests {
             JvmParam(JvmDouble, "d"),
             JvmParam(JvmTypes.Object.ref(), "o"),
         )) {
-            val i = localVars.getArgument("i")!!
-            val l = localVars.getArgument("l")!!
-            val f = localVars.getArgument("f")!!
-            val d = localVars.getArgument("d")!!
-            val o = localVars.getArgument("o")!!
+            val i = vars.getArgument("i")!!
+            val l = vars.getArgument("l")!!
+            val f = vars.getArgument("f")!!
+            val d = vars.getArgument("d")!!
+            val o = vars.getArgument("o")!!
             load(i)
             load(l)
             load(f)

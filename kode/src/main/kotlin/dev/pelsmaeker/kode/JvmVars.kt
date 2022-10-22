@@ -1,33 +1,28 @@
 package dev.pelsmaeker.kode
 
-
 import dev.pelsmaeker.kode.types.JvmType
 import dev.pelsmaeker.kode.utils.Scoped
 
-
 /**
- * A local variables table.
+ * A variables table.
  *
- * Local variables are scoped. This means that local variables in different sibling scopes can have the
+ * Variables are scoped. This means that variables in different sibling scopes can have the
  * same name and/or index, as long as they are unique in the context of the parents.
  */
-class JvmLocalVars(
+class JvmVars(
     /** The scope of any declared variables. */
     private val scope: JvmScope,
     /** The debug name; or `null`. */
     debugName: String? = null,
     /** The parent variables. */
-    parent: JvmLocalVars? = null,
+    parent: JvmVars? = null,
     /** Called when a variable is added. */
-    private val onAdd: (JvmLocalVar) -> Unit = {},
-): Scoped<JvmLocalVars>(debugName, parent), Iterable<JvmLocalVar> {
-
-//    /** The list of local variables declared in the method. */
-//    private val declaredLocalVars: MutableList<JvmLocalVar> = declaredLocalVars.toMutableList()
+    private val onAdd: (JvmVar) -> Unit = {},
+): Scoped<JvmVars>(debugName, parent), Iterable<JvmVar> {
 
     /**
-     * The offset of the first variable in this list. This is 0 if this the root [JvmLocalVars],
-     * or the next offset of the parent [JvmLocalVars].
+     * The offset of the first variable in this list. This is 0 if this the root [JvmVars],
+     * or the next offset of the parent [JvmVars].
      */
     private val baseVarOffset: Int = parent?.nextVarOffset ?: 0
 
@@ -35,13 +30,13 @@ class JvmLocalVars(
     private var nextVarOffset: Int = baseVarOffset
 
     /**
-     * The index of the first variable in this list. This is 0 if this the root [JvmLocalVars],
-     * or the next offset of the parent [JvmLocalVars].
+     * The index of the first variable in this list. This is 0 if this the root [JvmVars],
+     * or the next offset of the parent [JvmVars].
      */
     private val baseVarIndex: Int = parent?.size ?: 0
 
     /** All variables in this list, but not those in parent lists. */
-    private val vars: MutableList<JvmLocalVar> = ArrayList()
+    private val vars: MutableList<JvmVar> = ArrayList()
 
     /** Maps named variables in this list to their zero-based index in [vars]. */
     private val varsByName: MutableMap<String?, Int> = HashMap()
@@ -77,7 +72,7 @@ class JvmLocalVars(
      * @return the variable
      * @throws IllegalArgumentException if the index is out of bounds
      */
-    operator fun get(index: Int): JvmLocalVar {
+    operator fun get(index: Int): JvmVar {
         require(index in 0 until (baseVarOffset + vars.size))
         return if (index >= baseVarOffset) {
             vars[index - baseVarOffset]
@@ -94,7 +89,7 @@ class JvmLocalVars(
      * @return the variable
      * @throws IllegalArgumentException if the name is not found
      */
-    operator fun get(name: String): JvmLocalVar {
+    operator fun get(name: String): JvmVar {
         val index = varsByName[name]
             ?: return parent?.get(name)
             ?: throw IllegalArgumentException("No variable named $name")
@@ -116,7 +111,7 @@ class JvmLocalVars(
      *
      * @return the variable `this` reference; or `null` if it has none
      */
-    fun getThis(): JvmLocalVar? {
+    fun getThis(): JvmVar? {
         if (!hasThis()) return null
         return get(0)
     }
@@ -138,7 +133,7 @@ class JvmLocalVars(
      * @return the variable for the argument
      * @throws IllegalArgumentException if the index is out of bounds
      */
-    fun getArgument(index: Int): JvmLocalVar {
+    fun getArgument(index: Int): JvmVar {
         require(index in 0 until argumentCount) {
             "The index $index is out of bounds among the local variables."
         }
@@ -154,7 +149,7 @@ class JvmLocalVars(
      * @param name the name of the argument
      * @return the variable for the argument; or `null` if not found
      */
-    fun getArgument(name: String): JvmLocalVar? {
+    fun getArgument(name: String): JvmVar? {
         val index = varsByName[name] ?: return parent?.getArgument(name)
         return getArgument(baseVarIndex + index - thisCount)
     }
@@ -176,7 +171,7 @@ class JvmLocalVars(
      * @return the variable for the local variable
      * @throws IllegalArgumentException if the index is out of bounds
      */
-    fun getLocalVar(index: Int): JvmLocalVar {
+    fun getLocalVar(index: Int): JvmVar {
         require(index in 0 until localVarCount) {
             "The index $index is out of bounds among the local variables."
         }
@@ -192,7 +187,7 @@ class JvmLocalVars(
      * @param name the name of the local variable
      * @return the variable for the local variable; or `null` if not found
      */
-    fun getLocalVar(name: String): JvmLocalVar? {
+    fun getLocalVar(name: String): JvmVar? {
         val index = varsByName[name] ?: return parent?.getLocalVar(name)
         return getLocalVar(baseVarIndex + index - thisCount - argumentCount)
     }
@@ -211,9 +206,9 @@ class JvmLocalVars(
      * Adds a `this` reference.
      *
      * @param type the type of the `this` reference
-     * @return the added local variable
+     * @return the added variable
      */
-    fun addThis(type: JvmType): JvmLocalVar {
+    fun addThis(type: JvmType): JvmVar {
         check(!hasThis()) { "A `this` reference has already been added." }
         check(size == 0) { "Other variables have already been added." }
         _localHasThis = true
@@ -226,7 +221,7 @@ class JvmLocalVars(
      * @param parameter the parameter
      * @return the added variable
      */
-    fun addArgument(parameter: JvmParam): JvmLocalVar {
+    fun addArgument(parameter: JvmParam): JvmVar {
         return addArgument(parameter.type, parameter.name)
     }
 
@@ -237,7 +232,7 @@ class JvmLocalVars(
      * @param name the name of the argument; or `null` when it has no name
      * @return the added variable
      */
-    fun addArgument(type: JvmType, name: String? = null): JvmLocalVar {
+    fun addArgument(type: JvmType, name: String? = null): JvmVar {
         check(localVarCount == 0) { "Local variables have already been added." }
         _localArgumentCount += 1
         return add(type, name)
@@ -250,7 +245,7 @@ class JvmLocalVars(
      * @param name the name of the local variable; or `null` when it has no name
      * @return the created local variable
      */
-    fun addLocalVar(type: JvmType, name: String? = null): JvmLocalVar {
+    fun addLocalVar(type: JvmType, name: String? = null): JvmVar {
         _localLocalVarCount += 1
         return add(type, name)
     }
@@ -262,12 +257,12 @@ class JvmLocalVars(
      * @param name the name of the variable; or `null` when it has no name
      * @return the created variable
      */
-    private fun add(type: JvmType, name: String? = null): JvmLocalVar {
+    private fun add(type: JvmType, name: String? = null): JvmVar {
         require(!varsByName.containsKey(name)) {
             "A variable with the name '$name' already exists."
         }
         val offset = getFreshVarOffset(type)
-        val localVar = JvmLocalVar(name, type, scope, offset)
+        val localVar = JvmVar(name, type, scope, offset)
         val index = vars.size
         vars.add(localVar)
         if (name != null) varsByName[name] = index
@@ -276,19 +271,16 @@ class JvmLocalVars(
     }
 
     /**
-     * Creates a new child [JvmLocalVars] for the specified scope.
+     * Creates a new child [JvmVars] for the specified scope.
      *
      * This scope cannot be used while any child scope is not closed.
      *
      * @param scope the child scope
-     * @param debugName a debug name for the [JvmLocalVars]; or `null`
-     * @return a child [JvmLocalVars]
+     * @param debugName a debug name for the [JvmVars]; or `null`
+     * @return a child [JvmVars]
      */
-    fun scope(scope: JvmScope, debugName: String?): JvmLocalVars {
-        // We just pass the same `declaredLocalVars` on.
-        // Every local variable that is added to this child JvmLocalVars
-        // is also added to the `declaredLocalVars` of the method.
-        return adoptChild(JvmLocalVars(scope, debugName, this, onAdd))
+    fun scope(scope: JvmScope, debugName: String?): JvmVars {
+        return adoptChild(JvmVars(scope, debugName, this, onAdd))
     }
 
     /**
@@ -303,7 +295,7 @@ class JvmLocalVars(
         return index
     }
 
-    override fun iterator(): Iterator<JvmLocalVar> {
+    override fun iterator(): Iterator<JvmVar> {
         return vars.iterator()
     }
 }

@@ -30,8 +30,8 @@ class JvmScopeBuilder(
     /** The label for the end of the scope. */
     override val endLabel: JvmLabel = JvmLabel(this.debugName + "_end")
 
-    /** The local variables in this scope. */
-    val localVars: JvmLocalVars = JvmLocalVars(this, name, parent?.localVars) { methodBuilder.declaredLocalVars.add(it) }
+    /** The variables in this scope. */
+    val vars: JvmVars = JvmVars(this, name, parent?.vars) { methodBuilder.declaredVars.add(it) }
 
     init {
         // Add the start label
@@ -86,9 +86,9 @@ class JvmScopeBuilder(
      * @param type the type of the local variable
      * @return the created local variable
      */
-    fun localVar(name: String?, type: JvmType): JvmLocalVar {
+    fun localVar(name: String?, type: JvmType): JvmVar {
         checkUsable()
-        return localVars.addLocalVar(type, name)
+        return vars.addLocalVar(type, name)
     }
 
     /**
@@ -96,7 +96,7 @@ class JvmScopeBuilder(
      *
      * @return the local variable
      */
-    fun localThis(): JvmLocalVar {
+    fun localThis(): JvmVar {
         return localVar(
             "this",
             methodBuilder.classBuilder.declaration.ref() /* FIXME: Is this correct when the type is parameterized? */
@@ -112,7 +112,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to load from
      */
-    fun iLoad(variable: JvmLocalVar) {
+    fun iLoad(variable: JvmVar) {
         requireIsJvmType(JvmInteger, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.ILOAD, variable.offset)
     }
@@ -122,7 +122,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to load from
      */
-    fun lLoad(variable: JvmLocalVar) {
+    fun lLoad(variable: JvmVar) {
         requireIsJvmType(JvmLong, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.LLOAD, variable.offset)
     }
@@ -132,7 +132,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to load from
      */
-    fun fLoad(variable: JvmLocalVar) {
+    fun fLoad(variable: JvmVar) {
         requireIsJvmType(JvmFloat, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.FLOAD, variable.offset)
     }
@@ -142,7 +142,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to load from
      */
-    fun dLoad(variable: JvmLocalVar) {
+    fun dLoad(variable: JvmVar) {
         requireIsJvmType(JvmDouble, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.DLOAD, variable.offset)
     }
@@ -152,7 +152,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to load from
      */
-    fun aLoad(variable: JvmLocalVar) {
+    fun aLoad(variable: JvmVar) {
         require(variable.type.kind == JvmTypeKind.Object) {
             "Expected class or interface type, got ${variable.type}."
         }
@@ -166,7 +166,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to load from
      */
-    fun load(variable: JvmLocalVar) {
+    fun load(variable: JvmVar) {
         when (variable.type.kind) {
             JvmTypeKind.Integer -> iLoad(variable)
             JvmTypeKind.Long -> lLoad(variable)
@@ -186,7 +186,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to store to
      */
-    fun iStore(variable: JvmLocalVar) {
+    fun iStore(variable: JvmVar) {
         requireIsJvmType(JvmInteger, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.ISTORE, variable.offset)
     }
@@ -196,7 +196,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to store to
      */
-    fun lStore(variable: JvmLocalVar) {
+    fun lStore(variable: JvmVar) {
         requireIsJvmType(JvmLong, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.LSTORE, variable.offset)
     }
@@ -206,7 +206,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to store to
      */
-    fun fStore(variable: JvmLocalVar) {
+    fun fStore(variable: JvmVar) {
         requireIsJvmType(JvmFloat, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.FSTORE, variable.offset)
     }
@@ -216,7 +216,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to store to
      */
-    fun dStore(variable: JvmLocalVar) {
+    fun dStore(variable: JvmVar) {
         requireIsJvmType(JvmDouble, variable.type)
         methodBuilder.methodVisitor.visitVarInsn(Opcodes.DSTORE, variable.offset)
     }
@@ -226,7 +226,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to store to
      */
-    fun aStore(variable: JvmLocalVar) {
+    fun aStore(variable: JvmVar) {
         require(variable.type.kind == JvmTypeKind.Object) {
             "Expected class or interface type, got ${variable.type}."
         }
@@ -240,7 +240,7 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to store to
      */
-    fun store(variable: JvmLocalVar) {
+    fun store(variable: JvmVar) {
         when (variable.type.kind) {
             JvmTypeKind.Integer -> iStore(variable)
             JvmTypeKind.Long -> lStore(variable)
@@ -261,7 +261,7 @@ class JvmScopeBuilder(
      * @param variable the local variable to increment
      * @param value the signed constant value to increment by
      */
-    fun iInc(variable: JvmLocalVar, value: Byte) {
+    fun iInc(variable: JvmVar, value: Byte) {
         TODO()
     }
 
