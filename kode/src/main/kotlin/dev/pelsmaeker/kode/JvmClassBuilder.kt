@@ -194,7 +194,7 @@ class JvmClassBuilder internal constructor(
                         modifiers,
                     ).ref(JvmTypes.Object.ref())
                 )
-                ret()
+                vReturn()
             }.build()
         }.build()
     }

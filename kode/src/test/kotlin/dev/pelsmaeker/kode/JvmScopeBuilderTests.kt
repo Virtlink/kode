@@ -121,7 +121,7 @@ class JvmScopeBuilderTests {
             pop1()
             pop2()
             pop1()
-            ret()
+            vReturn()
         }
 
         // Act/Assert

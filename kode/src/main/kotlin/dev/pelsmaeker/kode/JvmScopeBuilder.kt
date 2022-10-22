@@ -103,61 +103,149 @@ class JvmScopeBuilder(
         )
     }
 
+    /**
+     * Emits an instruction with the given opcode.
+     * @param opcode the opcode to emit
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emit(opcode: Int): Unit {
+        checkUsable()
+        methodBuilder.methodVisitor.visitInsn(opcode)
+    }
+
+    /**
+     * Emits an instruction with the given opcode and operand.
+     * @param opcode the opcode to emit
+     * @param operand the operand
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitInt(opcode: Int, operand: Int): Unit {
+        checkUsable()
+        methodBuilder.methodVisitor.visitIntInsn(opcode, operand)
+    }
+
+    /**
+     * Emits an LDC instruction for the given value.
+     * @param value the value
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitLdc(value: Any?): Unit {
+        checkUsable()
+        methodBuilder.methodVisitor.visitLdcInsn(value)
+    }
+
+    /**
+     * Emits a type instruction for the given value.
+     * @param opcode the opcode to emit
+     * @param type the type
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitType(opcode: Int, type: JvmClassRef): Unit {
+        checkUsable()
+        methodBuilder.methodVisitor.visitTypeInsn(opcode, type.internalName)
+    }
+
+    /**
+     * Emits a jump instruction for the given value.
+     * @param opcode the opcode to emit
+     * @param label the label to jump to
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitJump(opcode: Int, label: JvmLabel): Unit {
+        checkUsable()
+        methodBuilder.methodVisitor.visitJumpInsn(opcode, label.internalLabel)
+    }
+
+    /**
+     * Emits an instruction with the given opcode and variable.
+     * @param opcode the opcode to emit
+     * @param variable the variable
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitVar(opcode: Int, variable: JvmVar): Unit {
+        checkUsable()
+        methodBuilder.methodVisitor.visitVarInsn(opcode, variable.offset)
+    }
+
+    /**
+     * Emits an instruction with the given opcode and Integer variable.
+     * @param opcode the opcode to emit
+     * @param variable the Integer variable
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitIVar(opcode: Int, variable: JvmVar): Unit {
+        require(variable.type == JvmInteger) {
+            "Expected $JvmInteger, got ${variable.type}."
+        }
+        emitVar(opcode, variable)
+    }
+
+    /**
+     * Emits an instruction with the given opcode and Long variable.
+     * @param opcode the opcode to emit
+     * @param variable the Long variable
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitLVar(opcode: Int, variable: JvmVar): Unit {
+        require(variable.type == JvmLong) {
+            "Expected $JvmLong, got ${variable.type}."
+        }
+        emitVar(opcode, variable)
+    }
+
+    /**
+     * Emits an instruction with the given opcode and Float variable.
+     * @param opcode the opcode to emit
+     * @param variable the Float variable
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitFVar(opcode: Int, variable: JvmVar): Unit {
+        require(variable.type == JvmFloat) {
+            "Expected $JvmFloat, got ${variable.type}."
+        }
+        emitVar(opcode, variable)
+    }
+
+    /**
+     * Emits an instruction with the given opcode and Double variable.
+     * @param opcode the opcode to emit
+     * @param variable the Double variable
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitDVar(opcode: Int, variable: JvmVar): Unit {
+        require(variable.type == JvmDouble) {
+            "Expected $JvmDouble, got ${variable.type}."
+        }
+        emitVar(opcode, variable)
+    }
+
+    /**
+     * Emits an instruction with the given opcode and Object variable.
+     * @param opcode the opcode to emit
+     * @param variable the Object variable
+     */
+    @Suppress("NOTHING_TO_INLINE", "RedundantUnitReturnType")
+    private inline fun emitAVar(opcode: Int, variable: JvmVar): Unit {
+        require(variable.type.kind == JvmTypeKind.Object) {
+            "Expected class or interface type, got ${variable.type}."
+        }
+        emitVar(opcode, variable)
+    }
+
     //////////
     // LOAD //
     //////////
 
-    /**
-     * Load an `int` value from a local variable on top of the stack.
-     *
-     * @param variable the local variable to load from
-     */
-    fun iLoad(variable: JvmVar) {
-        requireIsJvmType(JvmInteger, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ILOAD, variable.offset)
-    }
-
-    /**
-     * Load a `long` from a local variable on top of the stack.
-     *
-     * @param variable the local variable to load from
-     */
-    fun lLoad(variable: JvmVar) {
-        requireIsJvmType(JvmLong, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.LLOAD, variable.offset)
-    }
-
-    /**
-     * Load a `float` from a local variable on top of the stack.
-     *
-     * @param variable the local variable to load from
-     */
-    fun fLoad(variable: JvmVar) {
-        requireIsJvmType(JvmFloat, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.FLOAD, variable.offset)
-    }
-
-    /**
-     * Load a `double` from a local variable on top of the stack.
-     *
-     * @param variable the local variable to load from
-     */
-    fun dLoad(variable: JvmVar) {
-        requireIsJvmType(JvmDouble, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.DLOAD, variable.offset)
-    }
-
-    /**
-     * Load an object reference from a local variable on top of the stack.
-     *
-     * @param variable the local variable to load from
-     */
-    fun aLoad(variable: JvmVar) {
-        require(variable.type.kind == JvmTypeKind.Object) {
-            "Expected class or interface type, got ${variable.type}."
-        }
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ALOAD, variable.offset)
-    }
+    /** Load an `int` value from a local variable on top of the stack. */
+    fun iLoad(variable: JvmVar) = emitIVar(Opcodes.ILOAD, variable)
+    /** Load a `long` from a local variable on top of the stack. */
+    fun lLoad(variable: JvmVar) = emitLVar(Opcodes.LLOAD, variable)
+    /** Load a `float` from a local variable on top of the stack. */
+    fun fLoad(variable: JvmVar) = emitFVar(Opcodes.FLOAD, variable)
+    /** Load a `double` from a local variable on top of the stack. */
+    fun dLoad(variable: JvmVar) = emitDVar(Opcodes.DLOAD, variable)
+    /** Load an object reference from a local variable on top of the stack. */
+    fun aLoad(variable: JvmVar) = emitAVar(Opcodes.ALOAD, variable)
 
     /**
      * Loads a value from a local variable on top of the stack.
@@ -166,72 +254,29 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to load from
      */
-    fun load(variable: JvmVar) {
-        when (variable.type.kind) {
-            JvmTypeKind.Integer -> iLoad(variable)
-            JvmTypeKind.Long -> lLoad(variable)
-            JvmTypeKind.Float -> fLoad(variable)
-            JvmTypeKind.Double -> dLoad(variable)
-            JvmTypeKind.Object -> aLoad(variable)
-            else -> throw UnsupportedOperationException("Unsupported type: " + variable.type)
-        }
+    fun load(variable: JvmVar) = when (variable.type.kind) {
+        JvmTypeKind.Integer -> iLoad(variable)
+        JvmTypeKind.Long -> lLoad(variable)
+        JvmTypeKind.Float -> fLoad(variable)
+        JvmTypeKind.Double -> dLoad(variable)
+        JvmTypeKind.Object -> aLoad(variable)
+        else -> throw IllegalArgumentException("Unsupported type: " + variable.type)
     }
 
     ///////////
     // STORE //
     ///////////
 
-    /**
-     * Store the `int` on top of the stack into a local variable.
-     *
-     * @param variable the local variable to store to
-     */
-    fun iStore(variable: JvmVar) {
-        requireIsJvmType(JvmInteger, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ISTORE, variable.offset)
-    }
-
-    /**
-     * Store the `long` on top of the stack into a local variable.
-     *
-     * @param variable the local variable to store to
-     */
-    fun lStore(variable: JvmVar) {
-        requireIsJvmType(JvmLong, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.LSTORE, variable.offset)
-    }
-
-    /**
-     * Store the `float` on top of the stack into a local variable.
-     *
-     * @param variable the local variable to store to
-     */
-    fun fStore(variable: JvmVar) {
-        requireIsJvmType(JvmFloat, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.FSTORE, variable.offset)
-    }
-
-    /**
-     * Store the `double` on top of the stack into a local variable.
-     *
-     * @param variable the local variable to store to
-     */
-    fun dStore(variable: JvmVar) {
-        requireIsJvmType(JvmDouble, variable.type)
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.DSTORE, variable.offset)
-    }
-
-    /**
-     * Store the object reference on top of the stack into a local variable.
-     *
-     * @param variable the local variable to store to
-     */
-    fun aStore(variable: JvmVar) {
-        require(variable.type.kind == JvmTypeKind.Object) {
-            "Expected class or interface type, got ${variable.type}."
-        }
-        methodBuilder.methodVisitor.visitVarInsn(Opcodes.ASTORE, variable.offset)
-    }
+    /** Store the `int` on top of the stack into a local variable. */
+    fun iStore(variable: JvmVar) = emitIVar(Opcodes.ISTORE, variable)
+    /** Store the `long` on top of the stack into a local variable. */
+    fun lStore(variable: JvmVar) = emitLVar(Opcodes.LSTORE, variable)
+    /** Store the `float` on top of the stack into a local variable. */
+    fun fStore(variable: JvmVar) = emitFVar(Opcodes.FSTORE, variable)
+    /** Store the `double` on top of the stack into a local variable. */
+    fun dStore(variable: JvmVar) = emitDVar(Opcodes.DSTORE, variable)
+    /** Store the object reference on top of the stack into a local variable. */
+    fun aStore(variable: JvmVar) = emitAVar(Opcodes.ASTORE, variable)
 
     /**
      * Store the value on top of the stack into a local variable.
@@ -240,15 +285,13 @@ class JvmScopeBuilder(
      *
      * @param variable the local variable to store to
      */
-    fun store(variable: JvmVar) {
-        when (variable.type.kind) {
-            JvmTypeKind.Integer -> iStore(variable)
-            JvmTypeKind.Long -> lStore(variable)
-            JvmTypeKind.Float -> fStore(variable)
-            JvmTypeKind.Double -> dStore(variable)
-            JvmTypeKind.Object -> aStore(variable)
-            else -> throw UnsupportedOperationException("Unsupported type: " + variable.type)
-        }
+    fun store(variable: JvmVar) = when (variable.type.kind) {
+        JvmTypeKind.Integer -> iStore(variable)
+        JvmTypeKind.Long -> lStore(variable)
+        JvmTypeKind.Float -> fStore(variable)
+        JvmTypeKind.Double -> dStore(variable)
+        JvmTypeKind.Object -> aStore(variable)
+        else -> throw UnsupportedOperationException("Unsupported type: " + variable.type)
     }
 
     /////////////////////
@@ -270,96 +313,58 @@ class JvmScopeBuilder(
     ///////////
 
     /** Pop the top value from the stack. */
-    fun pop1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.POP)
-    }
-
+    fun pop1() = emit(Opcodes.POP)
     /** Pop the top two values from the stack. */
-    fun pop2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.POP2)
-    }
+    fun pop2() = emit(Opcodes.POP2)
+    /** Swap the top two values on the stack. */
+    fun swap() = emit(Opcodes.SWAP)
+    /** Duplicate the top value on the stack. */
+    fun dup1() = emit(Opcodes.DUP)
+    /** Duplicate the top two values on the stack. */
+    fun dup2() = emit(Opcodes.DUP2)
+    /** Duplicate the top value up to two values below the top of the stack. */
+    fun dup1_x1() = emit(Opcodes.DUP_X1)
+    /** Duplicate the two top values up to three values below the top of the stack. */
+    fun dup2_x1() = emit(Opcodes.DUP2_X1)
+    /** Duplicate the top value up to three values below the top of the stack. */
+    fun dup1_x2() = emit(Opcodes.DUP_X2)
+    /** Duplicate the up to two top values up to four values below the top of the stack. */
+    fun dup2_x2() = emit(Opcodes.DUP2_X2)
 
     /** Pops a value of the specified type from the stack. */
     fun pop(type: JvmType) = pop(type.kind)
-
     /** Pops a value of the specified kind from the stack. */
-    fun pop(kind: JvmTypeKind) {
-        when (kind.category) {
-            1 -> pop1()
-            2 -> pop2()
-            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
-        }
-    }
-
-    /** Swap the top two values on the stack. */
-    fun swap() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.SWAP)
-    }
-
-    /** Duplicate the top value on the stack. */
-    fun dup1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP)
-    }
-
-    /** Duplicate the top two values on the stack. */
-    fun dup2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2)
+    fun pop(kind: JvmTypeKind) = when (kind.category) {
+        1 -> pop1()
+        2 -> pop2()
+        else -> throw UnsupportedOperationException("Unsupported kind: $kind")
     }
 
     /** Duplicate a value of the specified type on the stack. */
     fun dup(type: JvmType) = dup(type.kind)
-
     /** Duplicate a value of the specified kind on the stack. */
-    fun dup(kind: JvmTypeKind) {
-        when (kind.category) {
-            1 -> dup1()
-            2 -> dup2()
-            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
-        }
-    }
-
-    /** Duplicate the top value up to two values below the top of the stack. */
-    fun dup1_x1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X1)
-    }
-
-    /** Duplicate the two top values up to three values below the top of the stack. */
-    fun dup2_x1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2_X1)
+    fun dup(kind: JvmTypeKind) = when (kind.category) {
+        1 -> dup1()
+        2 -> dup2()
+        else -> throw UnsupportedOperationException("Unsupported kind: $kind")
     }
 
     /** Duplicate a value of the specified type lower on the stack. */
     fun dup_x1(type: JvmType) = dup(type.kind)
-
     /** Duplicate a value of the specified kind lower on the stack. */
-    fun dup_x1(kind: JvmTypeKind) {
-        when (kind.category) {
-            1 -> dup1_x1()
-            2 -> dup2_x1()
-            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
-        }
-    }
-
-    /** Duplicate the top value up to three values below the top of the stack. */
-    fun dup1_x2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP_X2)
-    }
-
-    /** Duplicate the up to two top values up to four values below the top of the stack. */
-    fun dup2_x2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DUP2_X2)
+    fun dup_x1(kind: JvmTypeKind) = when (kind.category) {
+        1 -> dup1_x1()
+        2 -> dup2_x1()
+        else -> throw UnsupportedOperationException("Unsupported kind: $kind")
     }
 
     /** Duplicate a value of the specified type lower on the stack. */
     fun dup_x2(type: JvmType) = dup(type.kind)
-
     /** Duplicate a value of the specified kind lower on the stack. */
-    fun dup_x2(kind: JvmTypeKind) {
-        when (kind.category) {
-            1 -> dup1_x2()
-            2 -> dup2_x2()
-            else -> throw UnsupportedOperationException("Unsupported kind: $kind")
-        }
+    fun dup_x2(kind: JvmTypeKind) = when (kind.category) {
+        1 -> dup1_x2()
+        2 -> dup2_x2()
+        else -> throw UnsupportedOperationException("Unsupported kind: $kind")
     }
 
     ///////////////
@@ -367,39 +372,19 @@ class JvmScopeBuilder(
     ///////////////
 
     /** Push constant integer -1 on the stack. */
-    fun iConst_m1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_M1)
-    }
-
+    fun iConst_m1() = emit(Opcodes.ICONST_M1)
     /** Push constant integer 0 on the stack. */
-    fun iConst_0() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_0)
-    }
-
+    fun iConst_0() = emit(Opcodes.ICONST_0)
     /** Push constant integer 1 on the stack. */
-    fun iConst_1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_1)
-    }
-
+    fun iConst_1() = emit(Opcodes.ICONST_1)
     /** Push constant integer 2 on the stack. */
-    fun iConst_2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_2)
-    }
-
+    fun iConst_2() = emit(Opcodes.ICONST_2)
     /** Push constant integer 3 on the stack. */
-    fun iConst_3() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_3)
-    }
-
+    fun iConst_3() = emit(Opcodes.ICONST_3)
     /** Push constant integer 4 on the stack. */
-    fun iConst_4() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_4)
-    }
-
+    fun iConst_4() = emit(Opcodes.ICONST_4)
     /** Push constant integer 5 on the stack. */
-    fun iConst_5() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ICONST_5)
-    }
+    fun iConst_5() = emit(Opcodes.ICONST_5)
 
     /**
      * Push a constant `int` on the stack.
@@ -408,35 +393,28 @@ class JvmScopeBuilder(
      *
      * @param value the constant `int` value
      */
-    fun iConst(value: Int) {
-        when (value) {
-            -1 -> iConst_m1()
-            0 -> iConst_0()
-            1 -> iConst_1()
-            2 -> iConst_2()
-            3 -> iConst_3()
-            4 -> iConst_4()
-            5 -> iConst_5()
-            else -> if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
-                biPush(value.toByte())
-            } else if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
-                siPush(value.toShort())
-            } else {
-                ldc(Integer.valueOf(value))
-            }
+    fun iConst(value: Int) = when (value) {
+        -1 -> iConst_m1()
+        0 -> iConst_0()
+        1 -> iConst_1()
+        2 -> iConst_2()
+        3 -> iConst_3()
+        4 -> iConst_4()
+        5 -> iConst_5()
+        else -> if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
+            biPush(value.toByte())
+        } else if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
+            siPush(value.toShort())
+        } else {
+            ldc(Integer.valueOf(value))
         }
     }
 
 
     /** Push constant long integer 0 on the stack. */
-    fun lConst_0() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_0)
-    }
-
+    fun lConst_0() = emit(Opcodes.LCONST_0)
     /** Push constant long integer 1 on the stack. */
-    fun lConst_1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.LCONST_1)
-    }
+    fun lConst_1() = emit(Opcodes.LCONST_1)
 
     /**
      * Push a constant `long` on the stack.
@@ -445,28 +423,18 @@ class JvmScopeBuilder(
      *
      * @param value the constant `long` value
      */
-    fun lConst(value: Long) {
-        when (value) {
-            0L -> lConst_0()
-            1L -> lConst_1()
-            else -> ldc(java.lang.Long.valueOf(value))
-        }
+    fun lConst(value: Long) = when (value) {
+        0L -> lConst_0()
+        1L -> lConst_1()
+        else -> ldc(java.lang.Long.valueOf(value))
     }
 
     /** Push constant float 0 on the stack. */
-    fun fConst_0() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_0)
-    }
-
+    fun fConst_0() = emit(Opcodes.FCONST_0)
     /** Push constant float 1 on the stack. */
-    fun fConst_1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_1)
-    }
-
+    fun fConst_1() = emit(Opcodes.FCONST_1)
     /** Push constant float 2 on the stack. */
-    fun fConst_2() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.FCONST_2)
-    }
+    fun fConst_2() = emit(Opcodes.FCONST_2)
 
     /**
      * Push a constant `float` on the stack.
@@ -475,24 +443,17 @@ class JvmScopeBuilder(
      *
      * @param value the constant `float` value
      */
-    fun fConst(value: Float) {
-        when (value) {
-            0.0f -> fConst_0()
-            1.0f -> fConst_1()
-            2.0f -> fConst_2()
-            else -> ldc(java.lang.Float.valueOf(value))
-        }
+    fun fConst(value: Float) = when (value) {
+        0.0f -> fConst_0()
+        1.0f -> fConst_1()
+        2.0f -> fConst_2()
+        else -> ldc(java.lang.Float.valueOf(value))
     }
 
     /** Push constant double 0 on the stack. */
-    fun dConst_0() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_0)
-    }
-
+    fun dConst_0() = emit(Opcodes.DCONST_0)
     /** Push constant double 1 on the stack. */
-    fun dConst_1() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DCONST_1)
-    }
+    fun dConst_1() = emit(Opcodes.DCONST_1)
 
     /**
      * Push a constant `double` on the stack.
@@ -501,45 +462,27 @@ class JvmScopeBuilder(
      *
      * @param value the constant `double` value
      */
-    fun dConst(value: Double) {
-        when(value) {
-            0.0 -> dConst_0()
-            1.0 -> dConst_1()
-            else -> ldc(java.lang.Double.valueOf(value))
-        }
+    fun dConst(value: Double) = when(value) {
+        0.0 -> dConst_0()
+        1.0 -> dConst_1()
+        else -> ldc(java.lang.Double.valueOf(value))
     }
 
-    /**
-     * Push a constant byte value on the stack.
-     *
-     * @param value the constant byte value to push
-     */
-    fun biPush(value: Byte) {
-        methodBuilder.methodVisitor.visitIntInsn(Opcodes.BIPUSH, value.toInt())
-    }
-
-    /**
-     * Push a constant short value on the stack.
-     *
-     * @param value the constant short value to push
-     */
-    fun siPush(value: Short) {
-        methodBuilder.methodVisitor.visitIntInsn(Opcodes.SIPUSH, value.toInt())
-    }
-
+    /** Push a constant byte value on the stack. */
+    fun biPush(value: Byte) = emitInt(Opcodes.BIPUSH, value.toInt())
+    /** Push a constant short value on the stack. */
+    fun siPush(value: Short) = emitInt(Opcodes.SIPUSH, value.toInt())
     /** Push constant null on the stack. */
-    fun aConst_Null() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ACONST_NULL)
-    }
+    fun aConst_Null() = emit(Opcodes.ACONST_NULL)
 
     /**
      * Push a loaded constant on the stack.
      *
      * @param value the constant value to push
      */
-    fun ldc(value: Any) {
-        val a: Any = if (value is JvmType) Type.getType(value.descriptor) else value
-        methodBuilder.methodVisitor.visitLdcInsn(a)
+    fun ldc(value: Any) = when(value) {
+        is JvmType -> emitLdc(Type.getType(value.descriptor))
+        else -> emitLdc(value)
     }
 
     // ldc_w
@@ -552,17 +495,15 @@ class JvmScopeBuilder(
      *
      * @param value the constant value, which may be `null`
      */
-    fun const(value: Any?) {
-        when (value) {
-            is Byte -> biPush(value)
-            is Short -> siPush(value)
-            is Int -> iConst(value)
-            is Long -> lConst(value)
-            is Float -> fConst(value)
-            is Double -> dConst(value)
-            null -> aConst_Null()
-            else -> ldc(value)
-        }
+    fun const(value: Any?) = when (value) {
+        is Byte -> biPush(value)
+        is Short -> siPush(value)
+        is Int -> iConst(value)
+        is Long -> lConst(value)
+        is Float -> fConst(value)
+        is Double -> dConst(value)
+        null -> aConst_Null()
+        else -> ldc(value)
     }
 
     //////////////////////////
@@ -590,13 +531,9 @@ class JvmScopeBuilder(
     /**
      * Create a new instance of the specified type.
      *
-     * This method is named [.newInst] because `new` is a reserved Java keyword.
-     *
-     * @param type the type to create
+     * This method is named [newInst] because `new` is a reserved Java keyword.
      */
-    fun newInst(type: JvmClassRef) {
-        methodBuilder.methodVisitor.visitTypeInsn(Opcodes.NEW, type.internalName)
-    }
+    fun newInst(type: JvmClassRef) = emitType(Opcodes.NEW, type)
 
     ////////////
     // ARRAYS //
@@ -607,88 +544,29 @@ class JvmScopeBuilder(
     // JUMPS //
     ///////////
 
-    /**
-     * Pop the top stack value and goto label if greater than 0.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifGt(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFGT, label.internalLabel)
-    }
-
-    /**
-     * Pop the top stack value and goto label if greater than or equal to 0.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifGe(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFGE, label.internalLabel)
-    }
-
-    /**
-     * Pop the top stack value and goto label if equal to 0.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifEq(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFEQ, label.internalLabel)
-    }
-
-    /**
-     * Pop the top stack value and goto label if not equal to 0.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifNe(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFNE, label.internalLabel)
-    }
-
-    /**
-     * Pop the top stack value and goto label if less than or equal to 0.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifLe(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFLE, label.internalLabel)
-    }
-
-    /**
-     * Pop the top stack value and goto label if less than 0.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifLt(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFLT, label.internalLabel)
-    }
-
-    /**
-     * Pop the top stack value and goto label if `null`.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifNull(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFNULL, label.internalLabel)
-    }
-
-    /**
-     * Pop the top stack value and goto label if not `null`.
-     *
-     * @param label the label to jump to if the condition holds
-     */
-    fun ifNonNull(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.IFNONNULL, label.internalLabel)
-    }
+    /** Pop the top stack value and goto label if greater than 0. */
+    fun ifGt(label: JvmLabel) = emitJump(Opcodes.IFGT, label)
+    /** Pop the top stack value and goto label if greater than or equal to 0. */
+    fun ifGe(label: JvmLabel) = emitJump(Opcodes.IFGE, label)
+    /** Pop the top stack value and goto label if equal to 0. */
+    fun ifEq(label: JvmLabel) = emitJump(Opcodes.IFEQ, label)
+    /** Pop the top stack value and goto label if not equal to 0. */
+    fun ifNe(label: JvmLabel) = emitJump(Opcodes.IFNE, label)
+    /** Pop the top stack value and goto label if less than or equal to 0. */
+    fun ifLe(label: JvmLabel) = emitJump(Opcodes.IFLE, label)
+    /** Pop the top stack value and goto label if less than 0. */
+    fun ifLt(label: JvmLabel) = emitJump(Opcodes.IFLT, label)
+    /** Pop the top stack value and goto label if `null`. */
+    fun ifNull(label: JvmLabel) = emitJump(Opcodes.IFNULL, label)
+    /** Pop the top stack value and goto label if not `null`. */
+    fun ifNonNull(label: JvmLabel) = emitJump(Opcodes.IFNONNULL, label)
 
     /**
      * Goto label unconditionally.
      *
-     * This method is named [.jump] because `goto` is a reserved Java keyword.
-     *
-     * @param label the label to jump to
+     * This method is named [jump] because `goto` is a reserved Java keyword.
      */
-    fun jump(label: JvmLabel) {
-        methodBuilder.methodVisitor.visitJumpInsn(Opcodes.GOTO, label.internalLabel)
-    }
+    fun jump(label: JvmLabel) = emitJump(Opcodes.GOTO, label)
 
     /////////////////////////////
     // LABELS and LINE NUMBERS //
@@ -730,48 +608,29 @@ class JvmScopeBuilder(
     //////////////////
 
     /** Pop an object reference from the stack and throw it. */
-    fun aThrow() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ATHROW)
-    }
-
+    fun aThrow() = emit(Opcodes.ATHROW)
     /** Pop an `int` from the stack and return it. */
-    fun iReturn() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.IRETURN)
-    }
-
+    fun iReturn() = emit(Opcodes.IRETURN)
     /** Pop a `long` from the stack and return it. */
-    fun lReturn() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.LRETURN)
-    }
-
+    fun lReturn() = emit(Opcodes.LRETURN)
     /** Pop a `float` from the stack and return it. */
-    fun fReturn() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.FRETURN)
-    }
-
+    fun fReturn() = emit(Opcodes.FRETURN)
     /** Pop a `double` from the stack and return it. */
-    fun dReturn() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.DRETURN)
-    }
-
+    fun dReturn() = emit(Opcodes.DRETURN)
     /** Pop an object reference from the stack and return it. */
-    fun aReturn() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.ARETURN)
-    }
+    fun aReturn() = emit(Opcodes.ARETURN)
 
     /**
      * Return from a `void` method.
      *
-     * This method is named [.ret] because `return` is a reserved Java keyword.
+     * This method is named [vReturn] because `return` is a reserved Java keyword.
      */
-    fun ret() {
-        methodBuilder.methodVisitor.visitInsn(Opcodes.RETURN)
-    }
+    fun vReturn() = emit(Opcodes.RETURN)
 
     /**
      * Pop a value from the stack and return it.
      *
-     * This method is named [.ret] because `return` is a reserved Java keyword.
+     * This method is named [ret] because `return` is a reserved Java keyword.
      * This method picks the correct instruction for the given type.
      *
      * Note that if the return type is the primitive `void`, this method will generate a
@@ -781,16 +640,13 @@ class JvmScopeBuilder(
      *
      * @param type the type of value to return
      */
-    fun ret(type: JvmType) {
-        when (type.sort) {
-            JvmTypeSort.Void -> ret()
-            JvmTypeSort.Long -> lReturn()
-            JvmTypeSort.Float -> fReturn()
-            JvmTypeSort.Double -> dReturn()
-            JvmTypeSort.Character, JvmTypeSort.Boolean, JvmTypeSort.Byte, JvmTypeSort.Short, JvmTypeSort.Integer -> iReturn()
-            JvmTypeSort.TypeParam, JvmTypeSort.Array, JvmTypeSort.Class -> aReturn()
-            else -> throw UnsupportedOperationException("Unsupported return value: $type")
-        }
+    fun ret(type: JvmType) = when (type.kind) {
+        JvmTypeKind.Void -> vReturn()
+        JvmTypeKind.Integer -> iReturn()
+        JvmTypeKind.Long -> lReturn()
+        JvmTypeKind.Float -> fReturn()
+        JvmTypeKind.Double -> dReturn()
+        JvmTypeKind.Object -> aReturn()
     }
 
     /**
@@ -802,6 +658,7 @@ class JvmScopeBuilder(
      * @param defaultTarget the default target if none of the specified targets match
      */
     fun switch(targets: Map<Int, JvmLabel>, defaultTarget: JvmLabel) {
+        checkUsable()
         if (targets.isEmpty()) {
             jump(defaultTarget)
             return
@@ -826,6 +683,7 @@ class JvmScopeBuilder(
      * @param defaultTarget the default target if none of the specified targets match
      */
     fun lookupSwitch(targets: Map<Int, JvmLabel>, defaultTarget: JvmLabel) {
+        checkUsable()
         if (targets.isEmpty()) {
             jump(defaultTarget)
             return
@@ -850,6 +708,7 @@ class JvmScopeBuilder(
      * @param defaultTarget the default target if none of the specified targets match
      */
     fun tableSwitch(targets: Map<Int, JvmLabel>, defaultTarget: JvmLabel) {
+        checkUsable()
         if (targets.isEmpty()) {
             jump(defaultTarget)
             return
@@ -899,49 +758,55 @@ class JvmScopeBuilder(
      * @param method the reference to the method or constructor to be called
      */
     fun invokeMethod(method: JvmMethodRef) {
-        if (method.isConstructor) {
-            // Constructor
-            check(!method.owner.isInterface) { "Cannot invoke a constructor on an interface: $method" }
-            if (method.isStatic) {
-                // Static constructor
-                TODO()
-            } else {
-                // Instance constructor
+        checkUsable()
+        when {
+            method.isConstructor -> {
+                // Constructor
+                check(!method.owner.isInterface) { "Cannot invoke a constructor on an interface: $method" }
+                if (method.isStatic) {
+                    // Static constructor
+                    TODO()
+                } else {
+                    // Instance constructor
+                    methodBuilder.methodVisitor.visitMethodInsn(
+                        Opcodes.INVOKESPECIAL,
+                        method.owner.internalName,
+                        "<init>",
+                        method.descriptor,
+                        false
+                    )
+                }
+            }
+            method.isStatic -> {
+                // Static method
                 methodBuilder.methodVisitor.visitMethodInsn(
-                    Opcodes.INVOKESPECIAL,
+                    Opcodes.INVOKESTATIC,
                     method.owner.internalName,
-                    "<init>",
+                    method.name,
+                    method.descriptor,
+                    method.owner.isInterface
+                )
+            }
+            method.owner.isInterface -> {
+                // Instance method on an interface
+                methodBuilder.methodVisitor.visitMethodInsn(
+                    Opcodes.INVOKEINTERFACE,
+                    method.owner.internalName,
+                    method.name,
+                    method.descriptor,
+                    true
+                )
+            }
+            else -> {
+                // Instance method on a class
+                methodBuilder.methodVisitor.visitMethodInsn(
+                    Opcodes.INVOKEVIRTUAL,
+                    method.owner.internalName,
+                    method.name,
                     method.descriptor,
                     false
                 )
             }
-        } else if (method.isStatic) {
-            // Static method
-            methodBuilder.methodVisitor.visitMethodInsn(
-                Opcodes.INVOKESTATIC,
-                method.owner.internalName,
-                method.name,
-                method.descriptor,
-                method.owner.isInterface
-            )
-        } else if (method.owner.isInterface) {
-            // Instance method on an interface
-            methodBuilder.methodVisitor.visitMethodInsn(
-                Opcodes.INVOKEINTERFACE,
-                method.owner.internalName,
-                method.name,
-                method.descriptor,
-                true
-            )
-        } else {
-            // Instance method on a class
-            methodBuilder.methodVisitor.visitMethodInsn(
-                Opcodes.INVOKEVIRTUAL,
-                method.owner.internalName,
-                method.name,
-                method.descriptor,
-                false
-            )
         }
     }
 
@@ -959,6 +824,7 @@ class JvmScopeBuilder(
         handle: org.objectweb.asm.Handle,
         vararg arguments: Any,
     ) {
+        checkUsable()
         methodBuilder.methodVisitor.visitInvokeDynamicInsn(
             name,
             signature.descriptor,
@@ -979,6 +845,7 @@ class JvmScopeBuilder(
      */
     fun getField(field: JvmFieldRef) {
         require(field.owner.isClass) { "This type is not a class: " + field.owner }
+        checkUsable()
         if (field.isInstance) {
             methodBuilder.methodVisitor.visitFieldInsn(
                 Opcodes.GETFIELD,
@@ -1004,6 +871,7 @@ class JvmScopeBuilder(
      */
     fun putField(field: JvmFieldRef) {
         require(field.owner.isClass) { "This type is not a class: " + field.owner }
+        checkUsable()
         if (field.isInstance) {
             methodBuilder.methodVisitor.visitFieldInsn(
                 Opcodes.PUTFIELD,
@@ -1038,6 +906,7 @@ class JvmScopeBuilder(
      * @param builder the condition builder
      */
     fun assertThat(builder: (JvmScopeBuilder, JvmLabel) -> Unit) {
+        checkUsable()
         TODO()
         //        final JvmLabel endLabel = new JvmLabel();
 //        getField(new JvmFieldRef(getThisType(), "$assertionsDisabled", true, new JvmFieldSignature(JvmTypes.Boolean)));
