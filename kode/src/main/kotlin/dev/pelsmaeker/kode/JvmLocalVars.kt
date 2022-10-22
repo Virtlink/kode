@@ -12,60 +12,75 @@ import dev.pelsmaeker.kode.utils.Scoped
  * same name and/or index, as long as they are unique in the context of the parents.
  */
 class JvmLocalVars(
-    /** The scope of any declared local variables. */
+    /** The scope of any declared variables. */
     private val scope: JvmScope,
     /** The debug name; or `null`. */
     debugName: String? = null,
-    /** The parent local variables. */
+    /** The parent variables. */
     parent: JvmLocalVars? = null,
-    /** The list of local variables declared in the method. */
-    declaredLocalVars: List<JvmLocalVar> = emptyList(),
+    /** Called when a variable is added. */
+    private val onAdd: (JvmLocalVar) -> Unit = {},
 ): Scoped<JvmLocalVars>(debugName, parent), Iterable<JvmLocalVar> {
 
-    /** The list of local variables declared in the method. */
-    private val declaredLocalVars: MutableList<JvmLocalVar> = declaredLocalVars.toMutableList()
+//    /** The list of local variables declared in the method. */
+//    private val declaredLocalVars: MutableList<JvmLocalVar> = declaredLocalVars.toMutableList()
 
     /**
-     * The index of the first local variable in this list. This is 0 if this the root [JvmLocalVars],
-     * or the next index of the parent [JvmLocalVars].
+     * The offset of the first variable in this list. This is 0 if this the root [JvmLocalVars],
+     * or the next offset of the parent [JvmLocalVars].
      */
-    private val baseLocalVarIndex: Int = parent?.nextLocalVarIndex ?: 0
+    private val baseVarOffset: Int = parent?.nextVarOffset ?: 0
 
-    /** The index of the next local variable in this list. */
-    private var nextLocalVarIndex: Int = baseLocalVarIndex
-
-    /** The local variables in this list. */
-    private val localVars: MutableList<JvmLocalVar> = ArrayList()
-
-    /** The named local variables in this list. */
-    private val localVarsByName: MutableMap<String?, Int> = HashMap()
-
-    /** The number of arguments in the list. */
-    private var _argumentCount: Int = parent?.argumentCount ?: 0
-
-    /** Whether index 0 is the `this` argument. */
-    var hasThis: Boolean = parent?.hasThis ?: false
-        private set
+    /** The offset of the next variable in this list. */
+    private var nextVarOffset: Int = baseVarOffset
 
     /**
-     * Gets the number of local variables in scope.
-     *
-     * @return the number of local variables in scope
+     * The index of the first variable in this list. This is 0 if this the root [JvmLocalVars],
+     * or the next offset of the parent [JvmLocalVars].
      */
-    val size: Int get() = localVars.size + (parent?.size ?: 0)
+    private val baseVarIndex: Int = parent?.size ?: 0
+
+    /** All variables in this list, but not those in parent lists. */
+    private val vars: MutableList<JvmLocalVar> = ArrayList()
+
+    /** Maps named variables in this list to their zero-based index in [vars]. */
+    private val varsByName: MutableMap<String?, Int> = HashMap()
+
+    /** Whether index 0 in this list is the `this` variable. */
+    private var _localHasThis: Boolean = false
+
+    /** The number of arguments in this list. */
+    private var _localArgumentCount: Int = 0
+
+    /** The number of local variables in this list. */
+    private var _localLocalVarCount: Int = 0
+
+
+    /** The total number of variables in this list and parent lists. */
+    val size: Int get() = vars.size + (parent?.size ?: 0)
+
+    /** The number of 'this' variables in this list and parent lists. */
+    private val thisCount: Int get() = if (hasThis()) 1 else 0
+
+    /** The total number of arguments in this list and parent lists. */
+    val argumentCount: Int get() = _localArgumentCount + (parent?.argumentCount ?: 0)
+
+    /** The total number of local variables in this list and parent lists. */
+    val localVarCount: Int get() = _localLocalVarCount + (parent?.localVarCount ?: 0)
 
     /**
-     * Gets the local variable with the specified zero-based index.
+     * Gets the variable with the specified zero-based index.
      *
-     * If the method is an instance method, the local variable at index 0 is the `this` reference.
+     * If the method is an instance method, the variable at index 0 is the `this` reference.
      *
-     * @param index the index of the local variable
-     * @return the local variable
+     * @param index the index of the variable
+     * @return the variable
+     * @throws IllegalArgumentException if the index is out of bounds
      */
     operator fun get(index: Int): JvmLocalVar {
-        require(index in 0 until (baseLocalVarIndex + localVars.size))
-        return if (index >= baseLocalVarIndex) {
-            localVars[index - baseLocalVarIndex]
+        require(index in 0 until (baseVarOffset + vars.size))
+        return if (index >= baseVarOffset) {
+            vars[index - baseVarOffset]
         } else {
             // We are sure this scope has a parent scope.
             parent!![index]
@@ -73,55 +88,123 @@ class JvmLocalVars(
     }
 
     /**
-     * Gets the local variable with the specified name.
+     * Gets the variable with the specified name.
      *
-     * @param name the name of the local variable
-     * @return the local variable, if found; otherwise, `null`
+     * @param name the name of the variable
+     * @return the variable
+     * @throws IllegalArgumentException if the name is not found
      */
-    operator fun get(name: String): JvmLocalVar? {
-        val index = localVarsByName[name] ?: return parent?.get(name)
+    operator fun get(name: String): JvmLocalVar {
+        val index = varsByName[name]
+            ?: return parent?.get(name)
+            ?: throw IllegalArgumentException("No variable named $name")
         return get(index)
     }
 
     /**
-     * Gets the local variable that is the `this` reference.
+     * Determines whether there is a variable with the specified name.
      *
-     * @return the local variable `this` reference
+     * @return `true` when there is a variable with the specified name;
+     * otherwise, `false`
      */
-    val `this`: JvmLocalVar
-        get() {
-            check(hasThis) { "There is no `this` variable in the local variables." }
-            return get(0)
-        }
+    operator fun contains(name: String): Boolean {
+        return varsByName[name] != null || parent?.contains(name) == true
+    }
 
-    /** The number of arguments in this list. */
-    val argumentCount: Int get() = _argumentCount + (parent?.argumentCount ?: 0)
+    /**
+     * Gets the variable that is the `this` reference.
+     *
+     * @return the variable `this` reference; or `null` if it has none
+     */
+    fun getThis(): JvmLocalVar? {
+        if (!hasThis()) return null
+        return get(0)
+    }
+
+    /**
+     * Determines whether there is a `this` variable.
+     *
+     * @return `true` when there is a `this` variable;
+     * otherwise, `false`
+     */
+    fun hasThis(): Boolean {
+        return _localHasThis || parent?.hasThis() == true
+    }
 
     /**
      * Gets the argument with the specified index.
      *
      * @param index the zero-based index of the argument
-     * @return the local variable for the argument
+     * @return the variable for the argument
+     * @throws IllegalArgumentException if the index is out of bounds
      */
     fun getArgument(index: Int): JvmLocalVar {
-        require(index in 0 until argumentCount)
-        return get(index + if (hasThis) 1 else 0)
+        require(index in 0 until argumentCount) {
+            "The index $index is out of bounds among the local variables."
+        }
+        val realIndex = thisCount + index
+        val localIndex = realIndex - baseVarIndex
+        return if (localIndex < 0) parent!!.getArgument(index)
+        else vars[localIndex]
     }
 
     /**
      * Gets the argument with the specified name.
      *
      * @param name the name of the argument
-     * @return the local variable for the argument, if found; otherwise, `null`
+     * @return the variable for the argument; or `null` if not found
      */
     fun getArgument(name: String): JvmLocalVar? {
-        val index = localVarsByName[name]
-        if (index == null) {
-            return parent?.getArgument(name)
-        } else if (index >= argumentCount + if (hasThis) 1 else 0) {
-            return null
+        val index = varsByName[name] ?: return parent?.getArgument(name)
+        return getArgument(baseVarIndex + index - thisCount)
+    }
+
+    /**
+     * Determines whether there is an argument with the specified name.
+     *
+     * @return `true` when there is an argument with the specified name;
+     * otherwise, `false`
+     */
+    fun hasArgument(name: String): Boolean {
+        return getArgument(name) != null
+    }
+
+    /**
+     * Gets the variable with the specified index.
+     *
+     * @param index the zero-based index of the local variable
+     * @return the variable for the local variable
+     * @throws IllegalArgumentException if the index is out of bounds
+     */
+    fun getLocalVar(index: Int): JvmLocalVar {
+        require(index in 0 until localVarCount) {
+            "The index $index is out of bounds among the local variables."
         }
-        return getArgument(index - if (hasThis) 1 else 0)
+        val realIndex = thisCount + argumentCount + index
+        val localIndex = realIndex - baseVarIndex
+        return if (localIndex < 0) parent!!.getLocalVar(index)
+        else vars[localIndex]
+    }
+
+    /**
+     * Gets the variable with the specified name.
+     *
+     * @param name the name of the local variable
+     * @return the variable for the local variable; or `null` if not found
+     */
+    fun getLocalVar(name: String): JvmLocalVar? {
+        val index = varsByName[name] ?: return parent?.getLocalVar(name)
+        return getLocalVar(baseVarIndex + index - thisCount - argumentCount)
+    }
+
+    /**
+     * Determines whether there is a local variable with the specified name.
+     *
+     * @return `true` when there is a local variable with the specified name;
+     * otherwise, `false`
+     */
+    fun hasLocalVar(name: String): Boolean {
+        return getLocalVar(name) != null
     }
 
     /**
@@ -131,24 +214,33 @@ class JvmLocalVars(
      * @return the added local variable
      */
     fun addThis(type: JvmType): JvmLocalVar {
-        check(!hasThis) { "A `this` reference has already been defined." }
-        check(size == 0) { "Other local variables have already been added." }
-        hasThis = true
-        return addLocalVar(type, null)
+        check(!hasThis()) { "A `this` reference has already been added." }
+        check(size == 0) { "Other variables have already been added." }
+        _localHasThis = true
+        return add(type, null)
     }
 
     /**
-     * Adds a local variable for an argument.
+     * Adds a variable for an argument.
      *
      * @param parameter the parameter
-     * @return the added local variable
+     * @return the added variable
      */
     fun addArgument(parameter: JvmParam): JvmLocalVar {
-        check(size <= argumentCount + if (hasThis) 1 else 0) {
-            "Other local variables have already been added."
-        }
-        _argumentCount += 1
-        return addLocalVar(parameter.type, parameter.name)
+        return addArgument(parameter.type, parameter.name)
+    }
+
+    /**
+     * Adds a variable for an argument.
+     *
+     * @param type the type of the argument
+     * @param name the name of the argument; or `null` when it has no name
+     * @return the added variable
+     */
+    fun addArgument(type: JvmType, name: String? = null): JvmLocalVar {
+        check(localVarCount == 0) { "Local variables have already been added." }
+        _localArgumentCount += 1
+        return add(type, name)
     }
 
     /**
@@ -159,14 +251,27 @@ class JvmLocalVars(
      * @return the created local variable
      */
     fun addLocalVar(type: JvmType, name: String? = null): JvmLocalVar {
-        require(!localVarsByName.containsKey(name)) {
-            "A local variable with the name '$name' already exists."
+        _localLocalVarCount += 1
+        return add(type, name)
+    }
+
+    /**
+     * Creates and adds a variable with the specified name and type in the specified scope.
+     *
+     * @param type the type of the variable
+     * @param name the name of the variable; or `null` when it has no name
+     * @return the created variable
+     */
+    private fun add(type: JvmType, name: String? = null): JvmLocalVar {
+        require(!varsByName.containsKey(name)) {
+            "A variable with the name '$name' already exists."
         }
-        val index = freshLocalVarIndex
-        val localVar = JvmLocalVar(name, type, scope, index)
-        localVars.add(localVar)
-        declaredLocalVars.add(localVar)
-        if (name != null) localVarsByName[name] = index
+        val offset = getFreshVarOffset(type)
+        val localVar = JvmLocalVar(name, type, scope, offset)
+        val index = vars.size
+        vars.add(localVar)
+        if (name != null) varsByName[name] = index
+        onAdd(localVar)
         return localVar
     }
 
@@ -183,22 +288,22 @@ class JvmLocalVars(
         // We just pass the same `declaredLocalVars` on.
         // Every local variable that is added to this child JvmLocalVars
         // is also added to the `declaredLocalVars` of the method.
-        return adoptChild(JvmLocalVars(scope, debugName, this, declaredLocalVars))
+        return adoptChild(JvmLocalVars(scope, debugName, this, onAdd))
     }
 
     /**
-     * Gets a fresh local variable index.
+     * Gets a fresh variable offset.
      *
-     * @return a fresh local variable index
+     * @param type the type of variable
+     * @return the fresh variable offset
      */
-    private val freshLocalVarIndex: Int
-        get() {
-            val index = nextLocalVarIndex
-            nextLocalVarIndex += 1
-            return index
-        }
+    private fun getFreshVarOffset(type: JvmType): Int {
+        val index = nextVarOffset
+        nextVarOffset += type.kind.slotCount
+        return index
+    }
 
     override fun iterator(): Iterator<JvmLocalVar> {
-        return localVars.iterator()
+        return vars.iterator()
     }
 }

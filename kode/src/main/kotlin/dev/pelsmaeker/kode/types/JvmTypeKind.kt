@@ -18,5 +18,12 @@ enum class JvmTypeKind {
     /** Double type. */
     Double,
     /** Object type. */
-    Object
+    Object;
+
+    /** The number of stack slots occupied by this kind of type. */
+    val slotCount: Int get() = when (this) {
+        Void -> 0 // FIXME: Not sure about this one
+        Integer, Float, Object -> 1
+        Long, Double -> 2
+    }
 }

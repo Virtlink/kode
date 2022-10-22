@@ -27,7 +27,7 @@ class JvmMethodBuilder internal constructor(
 ): AutoCloseable {
 
     /** A list of local variables declared anywhere in the method's body. */
-    internal val declaredLocalVars: List<JvmLocalVar> = ArrayList()
+    internal val declaredLocalVars: MutableList<JvmLocalVar> = mutableListOf()
 
     /** The scope for the method's body instructions; or `null` when not yet set. */
     private var bodyScope: JvmScopeBuilder? = null

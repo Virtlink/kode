@@ -1,8 +1,7 @@
 package dev.pelsmaeker.kode
 
 import dev.pelsmaeker.kode.types.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -517,4 +516,519 @@ class JvmLocalVarsTests {
             localVars.addLocalVar(type, name)
         }
     }
+
+    @Test
+    fun `getThis() should return the 'this' variable, when it has been set`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val thisType = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addThis(thisType)
+
+        // Act
+        val v = localVars.getThis()!!
+
+        // Assert
+        assertEquals(thisType, v.type)
+        assertEquals(0, v.offset)
+        assertEquals(scope, v.scope)
+        assertNull(v.name)
+    }
+
+    @Test
+    fun `getThis() should return the 'this' variable, when it has been set in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val thisType = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addThis(thisType)
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val v = localVars.getThis()!!
+
+        // Assert
+        assertEquals(thisType, v.type)
+        assertEquals(0, v.offset)
+        assertEquals(scope, v.scope)
+        assertNull(v.name)
+    }
+
+    @Test
+    fun `getThis() should return false, when it has not been set`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        val v = localVars.getThis()
+
+        // Assert
+        assertNull(v)
+    }
+
+    @Test
+    fun `getArgument(String) should return the argument with the given name, when it has been added`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addArgument(JvmParam(JvmInteger))
+        localVars.addArgument(JvmParam(JvmLong))
+        localVars.addArgument(JvmParam(type, name))
+
+        // Act
+        val v = localVars.getArgument(name)!!
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getArgument(String) should return the argument with the given name, when it has been added in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addArgument(JvmParam(JvmInteger))
+        parentLocalVars.addArgument(JvmParam(JvmLong))
+        parentLocalVars.addArgument(JvmParam(type, name))
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val v = localVars.getArgument(name)!!
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getArgument(String) should return null, when it has not been added`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        val v = localVars.getArgument("myArg")
+
+        // Assert
+        assertNull(v)
+    }
+
+    @Test
+    fun `getArgument(Int) should return the argument with the given index, when it has been added`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addArgument(JvmParam(JvmInteger))
+        localVars.addArgument(JvmParam(JvmLong))
+        localVars.addArgument(JvmParam(type, name))
+
+        // Act
+        val v = localVars.getArgument(2)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getArgument(Int) should return the argument with the given index, when it has been added in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addArgument(JvmParam(JvmInteger))
+        parentLocalVars.addArgument(JvmParam(JvmLong))
+        parentLocalVars.addArgument(JvmParam(type, name))
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val v = localVars.getArgument(2)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getArgument(Int) should return the argument with the given index, when it follows arguments in the parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
+        parentLocalVars.addArgument(JvmParam(JvmInteger))
+        parentLocalVars.addArgument(JvmParam(JvmLong))
+        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
+        localVars.addArgument(JvmParam(type, name))
+
+        // Act
+        val v = localVars.getArgument(2)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getArgument(Int) should return the argument with the given index, when it follows 'this'`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addThis(JvmTypes.Object.ref())
+        localVars.addArgument(JvmParam(type, name))
+
+        // Act
+        val v = localVars.getArgument(0)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(1, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getArgument(Int) should throw, when it has not been added`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        assertThrows<IllegalArgumentException> {
+            localVars.getArgument(2)
+        }
+    }
+
+    @Test
+    fun `getLocalVar(String) should return the local variable with the given name, when it has been added`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addLocalVar(JvmInteger)
+        localVars.addLocalVar(JvmLong)
+        localVars.addLocalVar(type, name)
+
+        // Act
+        val v = localVars.getLocalVar(name)!!
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getLocalVar(String) should return the local variable with the given name, when it has been added in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addLocalVar(JvmInteger)
+        parentLocalVars.addLocalVar(JvmLong)
+        parentLocalVars.addLocalVar(type, name)
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val v = localVars.getLocalVar(name)!!
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getLocalVar(String) should return null, when it has not been added`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        val v = localVars.getLocalVar("myVar")
+
+        // Assert
+        assertNull(v)
+    }
+
+    @Test
+    fun `getLocalVar(Int) should return the local variable with the given index, when it has been added`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addLocalVar(JvmInteger)
+        localVars.addLocalVar(JvmLong)
+        localVars.addLocalVar(type, name)
+
+        // Act
+        val v = localVars.getLocalVar(2)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getLocalVar(Int) should return the local variable with the given index, when it has been added in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addLocalVar(JvmInteger)
+        parentLocalVars.addLocalVar(JvmLong)
+        parentLocalVars.addLocalVar(type, name)
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val v = localVars.getLocalVar(2)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getLocalVar(Int) should return the local variable with the given index, when it follows local variables in the parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(JvmSimpleScope())
+        parentLocalVars.addLocalVar(JvmInteger)
+        parentLocalVars.addLocalVar(JvmLong)
+        val localVars = JvmLocalVars(scope, parent = parentLocalVars)
+        localVars.addLocalVar(type, name)
+
+        // Act
+        val v = localVars.getLocalVar(2)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(3, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getLocalVar(Int) should return the local variable with the given index, when it follows 'this'`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addThis(JvmTypes.Object.ref())
+        localVars.addLocalVar(type, name)
+
+        // Act
+        val v = localVars.getLocalVar(0)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(1, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getLocalVar(Int) should return the local variable with the given index, when it follows arguments and 'this'`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addThis(JvmTypes.Object.ref())
+        localVars.addArgument(JvmParam(JvmInteger))
+        localVars.addArgument(JvmParam(JvmLong))
+        localVars.addLocalVar(type, name)
+
+        // Act
+        val v = localVars.getLocalVar(0)
+
+        // Assert
+        assertEquals(type, v.type)
+        assertEquals(4, v.offset)
+        assertEquals(scope, v.scope)
+        assertEquals(name, v.name)
+    }
+
+    @Test
+    fun `getLocalVar(Int) should throw, when it has not been added`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        assertThrows<IllegalArgumentException> {
+            localVars.getLocalVar(2)
+        }
+    }
+
+    @Test
+    fun `hasThis() should return true, when it has been set`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val thisType = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addThis(thisType)
+
+        // Act
+        val result = localVars.hasThis()
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `hasThis() should return true, when it has been set in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val thisType = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addThis(thisType)
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val result = localVars.hasThis()
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `hasThis() should return false, when it has not been set`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        val result = localVars.hasThis()
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `hasArgument(String) should return true, when it has been added`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addArgument(JvmParam(JvmInteger))
+        localVars.addArgument(JvmParam(JvmLong))
+        localVars.addArgument(JvmParam(type, name))
+
+        // Act
+        val result = localVars.hasArgument(name)
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `hasArgument(String) should return true, when it has been added in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myArg"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addArgument(JvmParam(JvmInteger))
+        parentLocalVars.addArgument(JvmParam(JvmLong))
+        parentLocalVars.addArgument(JvmParam(type, name))
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val result = localVars.hasArgument(name)
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `hasArgument(String) should return false, when it has not been added`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        val result = localVars.hasArgument("myArg")
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `hasLocalVar(String) should return true, when it has been added`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val localVars = JvmLocalVars(scope)
+        localVars.addLocalVar(JvmInteger)
+        localVars.addLocalVar(JvmLong)
+        localVars.addLocalVar(type, name)
+
+        // Act
+        val result = localVars.hasLocalVar(name)
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `hasLocalVar(String) should return true, when it has been added in a parent`() {
+        // Arrange
+        val scope = JvmSimpleScope()
+        val name = "myVar"
+        val type = JvmClassRef.of(String::class.java)
+        val parentLocalVars = JvmLocalVars(scope)
+        parentLocalVars.addLocalVar(JvmInteger)
+        parentLocalVars.addLocalVar(JvmLong)
+        parentLocalVars.addLocalVar(type, name)
+        val localVars = JvmLocalVars(JvmSimpleScope(), parent = parentLocalVars)
+
+        // Act
+        val result = localVars.hasLocalVar(name)
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `hasLocalVar(String) should return false, when it has not been added`() {
+        // Arrange
+        val localVars = JvmLocalVars(JvmSimpleScope())
+
+        // Act
+        val result = localVars.hasLocalVar("myVar")
+
+        // Assert
+        assertFalse(result)
+    }
+
 }

@@ -182,7 +182,7 @@ class JvmClassBuilder internal constructor(
         }
         return createConstructor(emptyList(), modifiers).apply {
             beginCode().apply {
-                val `this`: JvmLocalVar = localVars.`this`
+                val `this`: JvmLocalVar = localVars.getThis()!!
                 aLoad(`this`)
                 // This invokes the Object constructor
                 // FIXME: This should invoke the super constructor?

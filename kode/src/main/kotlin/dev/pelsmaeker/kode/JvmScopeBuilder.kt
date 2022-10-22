@@ -31,7 +31,7 @@ class JvmScopeBuilder(
     override val endLabel: JvmLabel = JvmLabel(this.debugName + "_end")
 
     /** The local variables in this scope. */
-    val localVars: JvmLocalVars = JvmLocalVars(this, name, parent?.localVars, methodBuilder.declaredLocalVars)
+    val localVars: JvmLocalVars = JvmLocalVars(this, name, parent?.localVars) { methodBuilder.declaredLocalVars.add(it) }
 
     init {
         // Add the start label

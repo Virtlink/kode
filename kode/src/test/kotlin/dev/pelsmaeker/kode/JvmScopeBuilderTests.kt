@@ -112,16 +112,16 @@ class JvmScopeBuilderTests {
             val f = localVars.getArgument("f")!!
             val d = localVars.getArgument("d")!!
             val o = localVars.getArgument("o")!!
-//            load(i)
-//            load(l)
-//            load(f)
+            load(i)
+            load(l)
+            load(f)
             load(d)
-//            load(o)
-//            pop()
+            load(o)
+            pop()
             pop2()
-//            pop()
-//            pop2()
-//            pop()
+            pop()
+            pop2()
+            pop()
             ret()
         }
 
