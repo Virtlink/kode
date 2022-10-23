@@ -315,20 +315,6 @@ class JvmScopeBuilder(
     fun pop1() = emit(Opcodes.POP)
     /** Pop the top two values from the stack. */
     fun pop2() = emit(Opcodes.POP2)
-    /** Swap the top two values on the stack. */
-    fun swap() = emit(Opcodes.SWAP)
-    /** Duplicate the top value on the stack. */
-    fun dup1() = emit(Opcodes.DUP)
-    /** Duplicate the top two values on the stack. */
-    fun dup2() = emit(Opcodes.DUP2)
-    /** Duplicate the top value up to two values below the top of the stack. */
-    fun dup1_x1() = emit(Opcodes.DUP_X1)
-    /** Duplicate the two top values up to three values below the top of the stack. */
-    fun dup2_x1() = emit(Opcodes.DUP2_X1)
-    /** Duplicate the top value up to three values below the top of the stack. */
-    fun dup1_x2() = emit(Opcodes.DUP_X2)
-    /** Duplicate the up to two top values up to four values below the top of the stack. */
-    fun dup2_x2() = emit(Opcodes.DUP2_X2)
 
     /** Pops a value of the specified type from the stack. */
     fun pop(type: JvmType) = pop(type.kind)
@@ -339,6 +325,14 @@ class JvmScopeBuilder(
         else -> throw UnsupportedOperationException("Unsupported kind: $kind")
     }
 
+    /** Swap the top two values on the stack. */
+    fun swap() = emit(Opcodes.SWAP)
+
+    /** Duplicate the top value on the stack. */
+    fun dup1() = emit(Opcodes.DUP)
+    /** Duplicate the top two values on the stack. */
+    fun dup2() = emit(Opcodes.DUP2)
+
     /** Duplicate a value of the specified type on the stack. */
     fun dup(type: JvmType) = dup(type.kind)
     /** Duplicate a value of the specified kind on the stack. */
@@ -348,8 +342,13 @@ class JvmScopeBuilder(
         else -> throw UnsupportedOperationException("Unsupported kind: $kind")
     }
 
+    /** Duplicate the top value up to two values below the top of the stack. */
+    fun dup1_x1() = emit(Opcodes.DUP_X1)
+    /** Duplicate the two top values up to three values below the top of the stack. */
+    fun dup2_x1() = emit(Opcodes.DUP2_X1)
+
     /** Duplicate a value of the specified type lower on the stack. */
-    fun dup_x1(type: JvmType) = dup(type.kind)
+    fun dup_x1(type: JvmType) = dup_x1(type.kind)
     /** Duplicate a value of the specified kind lower on the stack. */
     fun dup_x1(kind: JvmTypeKind) = when (kind.category) {
         1 -> dup1_x1()
@@ -357,8 +356,13 @@ class JvmScopeBuilder(
         else -> throw UnsupportedOperationException("Unsupported kind: $kind")
     }
 
+    /** Duplicate the top value up to three values below the top of the stack. */
+    fun dup1_x2() = emit(Opcodes.DUP_X2)
+    /** Duplicate the up to two top values up to four values below the top of the stack. */
+    fun dup2_x2() = emit(Opcodes.DUP2_X2)
+
     /** Duplicate a value of the specified type lower on the stack. */
-    fun dup_x2(type: JvmType) = dup(type.kind)
+    fun dup_x2(type: JvmType) = dup_x2(type.kind)
     /** Duplicate a value of the specified kind lower on the stack. */
     fun dup_x2(kind: JvmTypeKind) = when (kind.category) {
         1 -> dup1_x2()
