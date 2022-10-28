@@ -3,7 +3,9 @@ package dev.pelsmaeker.kode
 import dev.pelsmaeker.kode.types.*
 import dev.pelsmaeker.kode.types.JvmMethodRef.Companion.getMethod
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -582,6 +584,143 @@ class JvmScopeBuilderTests {
         }
     }
 
+    ///////////////
+    // CONSTANTS //
+    ///////////////
+
+    @Test
+    fun `iConst_m1() should load an Integer constant -1 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            iConst_m1()
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(-1, result)
+    }
+
+    @Test
+    fun `iConst_0() should load an Integer constant 0 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            iConst_0()
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(0, result)
+    }
+
+    @Test
+    fun `iConst_1() should load an Integer constant 1 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            iConst_1()
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(1, result)
+    }
+
+    @Test
+    fun `iConst_2() should load an Integer constant 2 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            iConst_2()
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(2, result)
+    }
+
+    @Test
+    fun `iConst_3() should load an Integer constant 3 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            iConst_3()
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(3, result)
+    }
+
+    @Test
+    fun `iConst_4() should load an Integer constant 4 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            iConst_4()
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(4, result)
+    }
+
+    @Test
+    fun `iConst_5() should load an Integer constant 5 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            iConst_5()
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(5, result)
+    }
+
+    @Test
+    fun `iConst() should load an Integer constant onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            iConst(-2147483648)
+            iConst(-32768)
+            iConst(-128)
+            iConst(-3)
+            iConst(-2)
+            iConst(-1)
+            iConst(0)
+            iConst(1)
+            iConst(2)
+            iConst(3)
+            iConst(4)
+            iConst(5)
+            iConst(6)
+            iConst(7)
+            iConst(127)
+            iConst(32767)
+            iConst(2147483647)
+            repeat(17) { pop1() }
+            vReturn()
+        }
+
+        // Act/Assert
+        compiledClass.runEvalMethod(methodDecl)
+    }
 
     private fun JvmCompiledClass.runEvalMethod(methodDecl: JvmMethodDecl, vararg args: Any?): Any? {
         val cls = this.load<Any>()
