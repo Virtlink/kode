@@ -2,11 +2,12 @@ package dev.pelsmaeker.kode
 
 import dev.pelsmaeker.kode.types.*
 import dev.pelsmaeker.kode.types.JvmMethodRef.Companion.getMethod
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.objectweb.asm.Opcodes
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -1083,6 +1084,526 @@ class JvmScopeBuilderTests {
 
         // Act/Assert
         compiledClass.runEvalMethod(methodDecl)
+    }
+
+    //////////////////////////
+    // ARITHMETIC and LOGIC //
+    //////////////////////////
+
+    ///////////
+    // CASTS //
+    ///////////
+
+    /////////////
+    // OBJECTS //
+    /////////////
+
+    ////////////
+    // ARRAYS //
+    ////////////
+
+    ///////////
+    // JUMPS //
+    ///////////
+
+    @Test
+    fun `ifGt() should branch if the value is greater than 0`() {
+        // Arrange
+        val value = 1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifGt(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifGt() should not branch if the value is equal to 0`() {
+        // Arrange
+        val value = 0
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifGt(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifGt() should not branch if the value is less than 0`() {
+        // Arrange
+        val value = -1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifGt(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifGe() should branch if the value is greater than 0`() {
+        // Arrange
+        val value = 1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifGe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifGe() should branch if the value is equal to 0`() {
+        // Arrange
+        val value = 0
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifGe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifGe() should not branch if the value is less than 0`() {
+        // Arrange
+        val value = -1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifGe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+    
+    @Test
+    fun `ifEq() should not branch if the value is greater than 0`() {
+        // Arrange
+        val value = 1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifEq(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifEq() should branch if the value is equal to 0`() {
+        // Arrange
+        val value = 0
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifEq(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifEq() should not branch if the value is less than 0`() {
+        // Arrange
+        val value = -1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifEq(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifNe() should branch if the value is greater than 0`() {
+        // Arrange
+        val value = 1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifNe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifNe() should not branch if the value is equal to 0`() {
+        // Arrange
+        val value = 0
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifNe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifNe() should branch if the value is less than 0`() {
+        // Arrange
+        val value = -1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifNe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+    
+    @Test
+    fun `ifLe() should not branch if the value is greater than 0`() {
+        // Arrange
+        val value = 1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifLe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifLe() should branch if the value is equal to 0`() {
+        // Arrange
+        val value = 0
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifLe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifLe() should branch if the value is less than 0`() {
+        // Arrange
+        val value = -1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifLe(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifLt() should not branch if the value is greater than 0`() {
+        // Arrange
+        val value = 1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifLt(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifLt() should not branch if the value is equal to 0`() {
+        // Arrange
+        val value = 0
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifLt(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifLt() should branch if the value is less than 0`() {
+        // Arrange
+        val value = -1
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(value)
+            val ifTrue = JvmLabel()
+            ifLt(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifNull() should branch if the value is 'null'`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(null)
+            val ifTrue = JvmLabel()
+            ifNull(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `ifNull() should not branch if the value is not 'null'`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const("Abc!")
+            val ifTrue = JvmLabel()
+            ifNull(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifNonNull() should not branch if the value is 'null'`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const(null)
+            val ifTrue = JvmLabel()
+            ifNonNull(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertFalse(result)
+    }
+
+    @Test
+    fun `ifNonNull() should branch if the value is not 'null'`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            const("Abc!")
+            val ifTrue = JvmLabel()
+            ifNonNull(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
+    }
+
+    @Test
+    fun `jump() should branch unconditionally`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmBoolean) {
+            val ifTrue = JvmLabel()
+            jump(ifTrue)
+            const(0)
+            iReturn()
+            label(ifTrue)
+            const(1)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+
+        // Assert
+        assertTrue(result)
     }
     
     private fun JvmCompiledClass.runEvalMethod(methodDecl: JvmMethodDecl, vararg args: Any?): Any? {
