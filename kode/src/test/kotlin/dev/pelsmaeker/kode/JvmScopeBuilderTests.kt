@@ -697,9 +697,9 @@ class JvmScopeBuilderTests {
     fun `iConst() should load an Integer constant onto the stack`() {
         // Arrange
         val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
-            iConst(-2147483648)
-            iConst(-32768)
-            iConst(-128)
+            iConst(Int.MIN_VALUE)
+            iConst(Short.MIN_VALUE.toInt())
+            iConst(Byte.MIN_VALUE.toInt())
             iConst(-3)
             iConst(-2)
             iConst(-1)
@@ -711,9 +711,9 @@ class JvmScopeBuilderTests {
             iConst(5)
             iConst(6)
             iConst(7)
-            iConst(127)
-            iConst(32767)
-            iConst(2147483647)
+            iConst(Byte.MAX_VALUE.toInt())
+            iConst(Short.MAX_VALUE.toInt())
+            iConst(Int.MAX_VALUE)
             repeat(17) { pop1() }
             vReturn()
         }
@@ -722,6 +722,369 @@ class JvmScopeBuilderTests {
         compiledClass.runEvalMethod(methodDecl)
     }
 
+    @Test
+    fun `biPush() should load a Byte constant onto the stack as an Integer`() {
+        // Arrange
+        val value: Byte = 120
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            biPush(value)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value.toInt(), result)
+    }
+
+    @Test
+    fun `siPush() should load a Short constant onto the stack as an Integer`() {
+        // Arrange
+        val value: Short = 30123
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            siPush(value)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value.toInt(), result)
+    }
+
+    @Test
+    fun `lConst_0() should load a Long constant 0 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmLong) {
+            lConst_0()
+            lReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(0L, result)
+    }
+
+    @Test
+    fun `lConst_1() should load a Long constant 1 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmLong) {
+            lConst_1()
+            lReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(1L, result)
+    }
+
+    @Test
+    fun `lConst() should load a Long constant onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            lConst(Long.MIN_VALUE)
+            lConst(0)
+            lConst(1)
+            lConst(Long.MAX_VALUE)
+            repeat(4) { pop2() }
+            vReturn()
+        }
+
+        // Act/Assert
+        compiledClass.runEvalMethod(methodDecl)
+    }
+
+    @Test
+    fun `fConst_0() should load a Float constant 0 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmFloat) {
+            fConst_0()
+            fReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(0.0f, result)
+    }
+
+    @Test
+    fun `fConst_1() should load a Float constant 1 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmFloat) {
+            fConst_1()
+            fReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(1.0f, result)
+    }
+
+    @Test
+    fun `fConst_2() should load a Float constant 2 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmFloat) {
+            fConst_2()
+            fReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(2.0f, result)
+    }
+
+    @Test
+    fun `fConst() should load a Float constant onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            fConst(Float.MIN_VALUE)
+            fConst(0.0f)
+            fConst(1.0f)
+            fConst(2.0f)
+            fConst(Float.MAX_VALUE)
+            repeat(5) { pop1() }
+            vReturn()
+        }
+
+        // Act/Assert
+        compiledClass.runEvalMethod(methodDecl)
+    }
+
+
+    @Test
+    fun `dConst_0() should load a Double constant 0 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmDouble) {
+            dConst_0()
+            dReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(0.0, result)
+    }
+
+    @Test
+    fun `dConst_1() should load a Double constant 1 onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmDouble) {
+            dConst_1()
+            dReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(1.0, result)
+    }
+
+    @Test
+    fun `dConst() should load a Float constant onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            dConst(Double.MIN_VALUE)
+            dConst(0.0)
+            dConst(1.0)
+            dConst(Double.MAX_VALUE)
+            repeat(4) { pop2() }
+            vReturn()
+        }
+
+        // Act/Assert
+        compiledClass.runEvalMethod(methodDecl)
+    }
+
+    @Test
+    fun `aConst_Null() should load an Object constant 'null' onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmTypes.Object.ref()) {
+            aConst_Null()
+            aReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun `ldc() should load an Integer constant onto the stack`() {
+        // Arrange
+        val value: Int = 42
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            ldc(value)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `ldc() should load a Long constant onto the stack`() {
+        // Arrange
+        val value: Long = 42L
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmLong) {
+            ldc(value)
+            lReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `ldc() should load a Float constant onto the stack`() {
+        // Arrange
+        val value: Float = 42.1337f
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmFloat) {
+            ldc(value)
+            fReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `ldc() should load a Double constant onto the stack`() {
+        // Arrange
+        val value: Double = 42.1337
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmDouble) {
+            ldc(value)
+            dReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `ldc() should load a string constant onto the stack`() {
+        // Arrange
+        val value: String = "My string constant"
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmTypes.String.ref()) {
+            ldc(value)
+            aReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `const() should load a constant onto the stack`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            // Long
+            const(Long.MIN_VALUE)
+            const(-1L)
+            const(0L)
+            const(1L)
+            const(2L)
+            const(3L)
+            const(4L)
+            const(5L)
+            const(Long.MAX_VALUE)
+            repeat(9) { pop2() }
+            // Double
+            const(Double.MIN_VALUE)
+            const(-1.0)
+            const(0.0)
+            const(1.0)
+            const(2.0)
+            const(3.0)
+            const(4.0)
+            const(5.0)
+            const(Double.MAX_VALUE)
+            repeat(9) { pop2() }
+            // Byte
+            const(Byte.MIN_VALUE)
+            const((-1).toByte())
+            const(0.toByte())
+            const(1.toByte())
+            const(2.toByte())
+            const(3.toByte())
+            const(4.toByte())
+            const(5.toByte())
+            const(Byte.MAX_VALUE)
+            repeat(9) { pop1() }
+            // Short
+            const(Short.MIN_VALUE)
+            const((-1).toShort())
+            const(0.toShort())
+            const(1.toShort())
+            const(2.toShort())
+            const(3.toShort())
+            const(4.toShort())
+            const(5.toShort())
+            const(Short.MAX_VALUE)
+            repeat(9) { pop1() }
+            // Float
+            const(Float.MIN_VALUE)
+            const(-1.0f)
+            const(0.0f)
+            const(1.0f)
+            const(2.0f)
+            const(3.0f)
+            const(4.0f)
+            const(5.0f)
+            const(Float.MAX_VALUE)
+            repeat(9) { pop1() }
+            // Int
+            const(Int.MIN_VALUE)
+            const(-1)
+            const(0)
+            const(1)
+            const(2)
+            const(3)
+            const(4)
+            const(5)
+            const(Int.MAX_VALUE)
+            repeat(9) { pop1() }
+            // Objects
+            const("My String Value")
+            const(null)
+            repeat(2) { pop1() }
+            vReturn()
+        }
+
+        // Act/Assert
+        compiledClass.runEvalMethod(methodDecl)
+    }
+    
     private fun JvmCompiledClass.runEvalMethod(methodDecl: JvmMethodDecl, vararg args: Any?): Any? {
         val cls = this.load<Any>()
         val instance = cls.getConstructor().newInstance()

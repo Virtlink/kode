@@ -413,6 +413,11 @@ class JvmScopeBuilder(
         }
     }
 
+    /** Push a constant byte value on the stack. */
+    fun biPush(value: Byte) = emitInt(Opcodes.BIPUSH, value.toInt())
+    /** Push a constant short value on the stack. */
+    fun siPush(value: Short) = emitInt(Opcodes.SIPUSH, value.toInt())
+
 
     /** Push constant long integer 0 on the stack. */
     fun lConst_0() = emit(Opcodes.LCONST_0)
@@ -471,10 +476,6 @@ class JvmScopeBuilder(
         else -> ldc(java.lang.Double.valueOf(value))
     }
 
-    /** Push a constant byte value on the stack. */
-    fun biPush(value: Byte) = emitInt(Opcodes.BIPUSH, value.toInt())
-    /** Push a constant short value on the stack. */
-    fun siPush(value: Short) = emitInt(Opcodes.SIPUSH, value.toInt())
     /** Push constant null on the stack. */
     fun aConst_Null() = emit(Opcodes.ACONST_NULL)
 
@@ -499,8 +500,8 @@ class JvmScopeBuilder(
      * @param value the constant value, which may be `null`
      */
     fun const(value: Any?) = when (value) {
-        is Byte -> biPush(value)
-        is Short -> siPush(value)
+        is Byte -> iConst(value.toInt())
+        is Short -> iConst(value.toInt())
         is Int -> iConst(value)
         is Long -> lConst(value)
         is Float -> fConst(value)
