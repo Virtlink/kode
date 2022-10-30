@@ -613,6 +613,7 @@ class JvmScopeBuilder(
 
     /** Pop an object reference from the stack and throw it. */
     fun aThrow() = emit(Opcodes.ATHROW)
+
     /** Pop an `int` from the stack and return it. */
     fun iReturn() = emit(Opcodes.IRETURN)
     /** Pop a `long` from the stack and return it. */

@@ -7,7 +7,9 @@ import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.objectweb.asm.Opcodes
+import java.lang.reflect.InvocationTargetException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -1605,6 +1607,153 @@ class JvmScopeBuilderTests {
         // Assert
         assertTrue(result)
     }
+
+    /////////////////////////////
+    // LABELS and LINE NUMBERS //
+    /////////////////////////////
+
+    @Test
+    fun `label() should emit a label for branching`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            val l2 = JvmLabel()
+            val l3 = JvmLabel()
+            jump(l3)
+            val l1 = label("Start")
+            vReturn()
+            label(l2)
+            jump(l1)
+            label(l3)
+            jump(l2)
+        }
+
+        // Act/Assert
+        assertDoesNotThrow {
+            compiledClass.runEvalMethod(methodDecl)
+        }
+    }
+
+    //////////////////
+    // CONTROL FLOW //
+    //////////////////
+
+    @Test
+    fun `aThrow() should throw an object`() {
+        // Arrange
+        val illegalStateExceptionType = JvmClassRef.of(IllegalStateException::class.java)
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            newInst(illegalStateExceptionType)
+            dup(illegalStateExceptionType)
+            ldc("Test exception!")
+            invokeConstructor(illegalStateExceptionType, JvmMethodSignature(JvmVoid, listOf(JvmParam(JvmTypes.String.ref()))))
+            aThrow()
+        }
+
+        // Act/Assert
+        assertThrows<IllegalStateException> {
+            try {
+                compiledClass.runEvalMethod(methodDecl)
+            } catch(ex: InvocationTargetException) {
+                throw ex.cause ?: ex
+            }
+        }
+    }
+
+    @Test
+    fun `iReturn() should return an Integer`() {
+        // Arrange
+        val value: Int = 6
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmInteger) {
+            const(value)
+            iReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `lReturn() should return a Long`() {
+        // Arrange
+        val value: Long = 6L
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmLong) {
+            const(value)
+            lReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `fReturn() should return a Float`() {
+        // Arrange
+        val value: Float = 4.2f;
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmFloat) {
+            const(value)
+            fReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `dReturn() should return a Double`() {
+        // Arrange
+        val value: Double = 4.2;
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmDouble) {
+            const(value)
+            dReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `aReturn() should return an Object`() {
+        // Arrange
+        val value: String = "My String!";
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmTypes.String.ref()) {
+            const(value)
+            aReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertEquals(value, result)
+    }
+
+    @Test
+    fun `vReturn() should return void`() {
+        // Arrange
+        val (methodDecl, compiledClass) = buildEvalMethodWith(JvmVoid) {
+            vReturn()
+        }
+
+        // Act
+        val result = compiledClass.runEvalMethod(methodDecl)
+
+        // Assert
+        assertNull(result)
+    }
+
+
     
     private fun JvmCompiledClass.runEvalMethod(methodDecl: JvmMethodDecl, vararg args: Any?): Any? {
         val cls = this.load<Any>()
