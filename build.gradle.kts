@@ -15,9 +15,10 @@ buildscript {
     "FUNCTION_CALL_EXPECTED"
 )
 plugins {
+    java
     jacoco
     `maven-publish`
-    java
+    signing
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.gitversion)
@@ -47,6 +48,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
+    apply(plugin = "signing")
     apply(plugin = "jacoco")
     apply(plugin = "project-report")
 
@@ -55,6 +57,7 @@ subprojects {
     }
 
     configure<JavaPluginExtension> {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(11))
         withSourcesJar()
         withJavadocJar()
     }
@@ -77,6 +80,33 @@ subprojects {
         publications {
             create<MavenPublication>("library") {
                 from(components["java"])
+
+                pom {
+                    name.set("Kode")
+                    description.set(project.description)
+                    url.set("https://github.com/Virtlink/kode-jvm")
+                    inceptionYear.set("2022")
+                    licenses {
+                        // From: https://spdx.org/licenses/
+                        license {
+                            name.set("MIT")
+                            url.set("https://opensource.org/licenses/MIT")
+                            distribution.set("repo")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("virtlink")
+                            name.set("Daniel A. A. Pelsmaeker")
+                            email.set("d.a.a.pelsmaeker@tudelft.nl")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git@github.com:Virtlink/kode-jvm.git")
+                        developerConnection.set("scm:git@github.com:Virtlink/kode-jvm.git")
+                        url.set("scm:git@github.com:Virtlink/kode-jvm.git")
+                    }
+                }
             }
         }
         repositories {
@@ -88,6 +118,18 @@ subprojects {
                     password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
                 }
             }
+            maven {
+                name = "OSSRH"
+                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = System.getenv("OSSRH_USERNAME")
+                    password = System.getenv("OSSRH_TOKEN")
+                }
+            }
         }
+    }
+
+    signing {
+        sign(publishing.publications["library"])
     }
 }
