@@ -30,7 +30,7 @@ allprojects {
 
     val gitVersion: groovy.lang.Closure<String> by extra
 
-    group = "dev.pelsmaeker"
+    group = "com.virtlink"
     version = gitVersion()
 
     repositories {
