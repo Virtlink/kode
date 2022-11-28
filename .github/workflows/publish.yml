@@ -95,7 +95,7 @@ jobs:
       - name: Publish to GitHub Packages
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publish
+          arguments: publish --stacktrace
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release on GitHub
