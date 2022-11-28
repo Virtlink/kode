@@ -1,3 +1,3 @@
-rootProject.name = "kode-jvm"
+rootProject.name = "kode-project"
 
 include(":kode")

@@ -11,7 +11,7 @@ Please go to [Stackoverflow](https://stackoverflow.com/) and ask your question t
 Please do **not** make an issue on the Github repository.
 
 #### **You found a bug**
-Search the [Issues](https://github.com/Virtlink/kode-jvm/issues) to ensure the bug has not been reported before.
+Search the [Issues](https://github.com/Virtlink/kode/issues) to ensure the bug has not been reported before.
 
 If the bug is new, open a new issue with a _clear title and description_.
 Please indicate:

@@ -102,5 +102,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: "Release ${{ github.ref_name }}"
-          files: build/libs/kode-jvm-${{ github.ref_name }}*
+          files: build/libs/kode-${{ github.ref_name }}*
           fail_on_unmatched_files: true

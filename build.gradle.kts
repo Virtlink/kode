@@ -84,7 +84,7 @@ subprojects {
                 pom {
                     name.set("Kode")
                     description.set(project.description)
-                    url.set("https://github.com/Virtlink/kode-jvm")
+                    url.set("https://github.com/Virtlink/kode")
                     inceptionYear.set("2022")
                     licenses {
                         // From: https://spdx.org/licenses/
@@ -102,9 +102,9 @@ subprojects {
                         }
                     }
                     scm {
-                        connection.set("scm:git@github.com:Virtlink/kode-jvm.git")
-                        developerConnection.set("scm:git@github.com:Virtlink/kode-jvm.git")
-                        url.set("scm:git@github.com:Virtlink/kode-jvm.git")
+                        connection.set("scm:git@github.com:Virtlink/kode.git")
+                        developerConnection.set("scm:git@github.com:Virtlink/kode.git")
+                        url.set("scm:git@github.com:Virtlink/kode.git")
                     }
                 }
             }
@@ -112,7 +112,7 @@ subprojects {
         repositories {
             maven {
                 name = "GitHub"
-                url = uri("https://maven.pkg.github.com/Virtlink/kode-jvm")
+                url = uri("https://maven.pkg.github.com/Virtlink/kode")
                 credentials {
                     username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
                     password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
