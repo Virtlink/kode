@@ -31,7 +31,7 @@ allprojects {
 
     val gitVersion: groovy.lang.Closure<String> by extra
 
-    group = "com.virtlink"
+    group = "net.pelsmaeker"
     version = gitVersion()
 
     repositories {
@@ -96,9 +96,9 @@ subprojects {
                     }
                     developers {
                         developer {
-                            id.set("virtlink")
+                            id.set("Virtlink")
                             name.set("Daniel A. A. Pelsmaeker")
-                            email.set("d.a.a.pelsmaeker@tudelft.nl")
+                            email.set("developer@pelsmaeker.net")
                         }
                     }
                     scm {
