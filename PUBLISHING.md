@@ -93,7 +93,7 @@ To publish a new version of the library manually from the command-line, follow t
 
 ## Releasing the Artifact
 After publishing, the artifact must be released manually from Maven Central. To do so, follow these steps:
-1.  Login into OSSRH at [oss.sonatype.org](https://oss.sonatype.org/)
+1.  Login into OSSRH at [s01.oss.sonatype.org](https://s01.oss.sonatype.org/)
 2.  Go to 'Staging Repositories' on the left, click the 'Refresh' button at the top to see the repositories.
 3.  Select the repository, and click the 'Close' button at the top.
     This will validate the package requirements. Wait for it to complete,

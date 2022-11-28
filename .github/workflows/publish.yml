@@ -35,10 +35,12 @@
 #
 # Obtaining the OSSRH_USERNAME and OSSRH_TOKEN:
 #
-# 1. Login into https://oss.sonatype.org/
+# 1. Login into https://s01.oss.sonatype.org/
 # 2. Click your username in the top-right, go to Profile.
 # 3. In the drop-down box, change from Summary to User Token.
 # 4. Click the Access User Token button. It will give a username and token.
+#
+# NOTE: The User Token obtained from `oss.sonatype.org` is different from the one from `s01.oss.sonatype.org`.
 #
 # Obtaining the OSSRH_SIGNING_KEY_ID, use the eight hexadecimal digits
 # after the key type (e.g., `00B5050F`):
