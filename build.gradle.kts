@@ -33,6 +33,7 @@ allprojects {
 
     group = "net.pelsmaeker"
     version = gitVersion()
+    description = "An easier interface to generate JVM classes and bytecode, written in Kotlin."
 
     repositories {
         google()
