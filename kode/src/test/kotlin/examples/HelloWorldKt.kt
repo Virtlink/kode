@@ -1,7 +1,7 @@
 package examples
 
-import com.virtlink.kode.*
-import com.virtlink.kode.types.*
+import net.pelsmaeker.kode.*
+import net.pelsmaeker.kode.types.*
 import org.junit.jupiter.api.Test
 import java.io.PrintStream
 
