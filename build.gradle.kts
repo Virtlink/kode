@@ -112,14 +112,6 @@ subprojects {
         }
         repositories {
             maven {
-                name = "GitHub"
-                url = uri("https://maven.pkg.github.com/Virtlink/kode")
-                credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-                }
-            }
-            maven {
                 val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
                 val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
                 name = "OSSRH"
@@ -127,6 +119,14 @@ subprojects {
                 credentials {
                     username = project.findProperty("ossrh.user") as String? ?: System.getenv("OSSRH_USERNAME")
                     password = project.findProperty("ossrh.token") as String? ?: System.getenv("OSSRH_TOKEN")
+                }
+            }
+            maven {
+                name = "GitHub"
+                url = uri("https://maven.pkg.github.com/Virtlink/kode")
+                credentials {
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
                 }
             }
         }
