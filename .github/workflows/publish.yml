@@ -20,14 +20,14 @@
 #     package on Maven Central. The repository may be dropped after release.
 # 8.  Again, wait for the operation to complete.
 # 9.  It can take a while for the new release to appear on Maven Central at:
-#     https://search.maven.org/artifact/com.virtlink.commons/commons-configuration2-jackson
+#     https://search.maven.org/artifact/net.pelsmaeker.commons/commons-configuration2-jackson
 # 10. Done!
 #
 #
 # Setup
 # -----
 # This requires the following secrets to be set in GitHub:
-# - OSSRH_USERNAME: The OSSRH username
+# - OSSRH_USERNAME: The OSSRH token username
 # - OSSRH_TOKEN: The OSSRH token
 # - OSSRH_SIGNING_KEY_ID: The ID of the GPG signing key (see below)
 # - OSSRH_SIGNING_KEY_PASSWORD: The password for the signing key
@@ -40,7 +40,8 @@
 # 3. In the drop-down box, change from Summary to User Token.
 # 4. Click the Access User Token button. It will give a username and token.
 #
-# Obtaining the OSSRH_SIGNING_KEY_ID:
+# Obtaining the OSSRH_SIGNING_KEY_ID, use the eight hexadecimal digits
+# after the key type (e.g., `00B5050F`):
 #
 # ```
 # gpg --list-secret-keys --keyid-format SHORT
