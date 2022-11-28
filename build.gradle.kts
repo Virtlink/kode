@@ -86,11 +86,12 @@ subprojects {
                     description.set(project.description)
                     url.set("https://github.com/Virtlink/kode")
                     inceptionYear.set("2022")
+                    packaging = "jar"
                     licenses {
                         // From: https://spdx.org/licenses/
                         license {
-                            name.set("MIT")
-                            url.set("https://opensource.org/licenses/MIT")
+                            name.set("Apache-2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0")
                             distribution.set("repo")
                         }
                     }
@@ -119,11 +120,13 @@ subprojects {
                 }
             }
             maven {
+                val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
                 name = "OSSRH"
-                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                url = if (project.version.toString().endsWith("-SNAPSHOT")) releasesRepoUrl else snapshotsRepoUrl
                 credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_TOKEN")
+                    username = project.findProperty("ossrh.user") as String? ?: System.getenv("OSSRH_USERNAME")
+                    password = project.findProperty("ossrh.token") as String? ?: System.getenv("OSSRH_TOKEN")
                 }
             }
         }
