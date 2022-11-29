@@ -19,10 +19,7 @@ dependencies {
 
     // Testing
     testImplementation  (libs.kotlin.reflect)
-    testImplementation  (libs.junit.core)
-    testImplementation  (libs.junit.api)
-    testImplementation  (libs.junit.engine)
-    testImplementation  (libs.junit.params)
+    testImplementation  (libs.junit)
     testImplementation  (libs.awaitility.core)
     testImplementation  (libs.awaitility.kotlin)
 }
