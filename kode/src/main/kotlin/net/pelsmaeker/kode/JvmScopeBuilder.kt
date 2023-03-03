@@ -514,6 +514,260 @@ class JvmScopeBuilder(
     // ARITHMETIC and LOGIC //
     //////////////////////////
 
+    /**
+     * Add two double values.
+     *
+     * Stack: `.., a: double, b: double -> .., r: double`
+     */
+    fun dAdd() = emit(Opcodes.DADD)
+
+    /**
+     * Add two float values.
+     *
+     * Stack: `.., a: float, b: float -> .., r: float`
+     */
+    fun fAdd() = emit(Opcodes.FADD)
+
+    /**
+     * Add two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iAdd() = emit(Opcodes.IADD)
+
+    /**
+     * Add two long values.
+     *
+     * Stack: `.., a: Long, b: Long -> .., r: Long`
+     */
+    fun lAdd() = emit(Opcodes.LADD)
+
+    /**
+     * Subtract two double values.
+     *
+     * Stack: `.., a: double, b: double -> .., r: double`
+     */
+    fun dSub() = emit(Opcodes.DSUB)
+
+    /**
+     * Subtract two float values.
+     *
+     * Stack: `.., a: float, b: float -> .., r: float`
+     */
+    fun fSub() = emit(Opcodes.FSUB)
+
+    /**
+     * Subtract two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iSub() = emit(Opcodes.ISUB)
+
+    /**
+     * Subtract two long values.
+     *
+     * Stack: `.., a: long, b: long -> .., r: long`
+     */
+    fun lSub() = emit(Opcodes.LSUB)
+
+    /**
+     * Divide two double values.
+     *
+     * Stack: `.., a: double, b: double -> .., r: double`
+     */
+    fun dDiv() = emit(Opcodes.DDIV)
+
+    /**
+     * Divide two float values.
+     *
+     * Stack: `.., a: float, b: float -> .., r: float`
+     */
+    fun fDiv() = emit(Opcodes.FDIV)
+
+    /**
+     * Divide two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iDiv() = emit(Opcodes.IDIV)
+
+    /**
+     * Divide two long values.
+     *
+     * Stack: `.., a: long, b: long -> .., r: long`
+     */
+    fun lDiv() = emit(Opcodes.LDIV)
+
+    /**
+     * Multiply two double values.
+     *
+     * Stack: `.., a: double, b: double -> .., r: double`
+     */
+    fun dMul() = emit(Opcodes.DMUL)
+
+    /**
+     * Multiply two float values.
+     *
+     * Stack: `.., a: float, b: float -> .., r: float`
+     */
+    fun fMul() = emit(Opcodes.FMUL)
+
+    /**
+     * Multiply two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iMul() = emit(Opcodes.IMUL)
+
+    /**
+     * Multiply two long values.
+     *
+     * Stack: `.., a: long, b: long -> .., r: long`
+     */
+    fun lMul() = emit(Opcodes.LMUL)
+
+    /**
+     * Remainder of dividing two double values.
+     *
+     * Stack: `.., a: double, b: double -> .., r: double`
+     */
+    fun dRem() = emit(Opcodes.DREM)
+
+    /**
+     * Remainder of dividing two float values.
+     *
+     * Stack: `.., a: float, b: float -> .., r: float`
+     */
+    fun fRem() = emit(Opcodes.FREM)
+
+    /**
+     * Remainder of dividing two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iRem() = emit(Opcodes.IREM)
+
+    /**
+     * Remainder of dividing two long values.
+     *
+     * Stack: `.., a: long, b: long -> .., r: long`
+     */
+    fun lRem() = emit(Opcodes.LREM)
+
+    /**
+     * Negate a double value.
+     *
+     * Stack: `.., a: double -> .., r: double`
+     */
+    fun dNeg() = emit(Opcodes.DNEG)
+
+    /**
+     * Negate a float value.
+     *
+     * Stack: `.., a: float -> .., r: float`
+     */
+    fun fNeg() = emit(Opcodes.FNEG)
+
+    /**
+     * Negate an integer value.
+     *
+     * Stack: `.., a: int -> .., r: int`
+     */
+    fun iNeg() = emit(Opcodes.INEG)
+
+    /**
+     * Negate a long value.
+     *
+     * Stack: `.., a: long -> .., r: long`
+     */
+    fun lNeg() = emit(Opcodes.LNEG)
+
+    /**
+     * Bitwise-AND of two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iAnd() = emit(Opcodes.IAND)
+
+    /**
+     * Bitwise-AND of two long values.
+     *
+     * Stack: `.., a: long, b: long -> .., r: long`
+     */
+    fun lAnd() = emit(Opcodes.LAND)
+
+    /**
+     * Bitwise-OR of two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iOr() = emit(Opcodes.IOR)
+
+    /**
+     * Bitwise-OR of two integer values.
+     *
+     * Stack: `.., a: long, b: long -> .., r: long`
+     */
+    fun lOr() = emit(Opcodes.LOR)
+
+    /**
+     * Bitwise-XOR of two integer values.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iXor() = emit(Opcodes.IXOR)
+
+    /**
+     * Bitwise-XOR of two long values.
+     *
+     * Stack: `.., a: long, b: long -> .., r: long`
+     */
+    fun lXor() = emit(Opcodes.LXOR)
+
+    /**
+     * Bitwise left-shift an integer value by an integer number of bits.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iShl() = emit(Opcodes.ISHL)
+
+    /**
+     * Bitwise left-shift a long value by an integer number of bits.
+     *
+     * Stack: `.., a: long, b: int -> .., r: long`
+     */
+    fun lShl() = emit(Opcodes.LSHL)
+
+    /**
+     * Bitwise right-shift an integer value by an integer number of bits.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iShr() = emit(Opcodes.ISHR)
+
+    /**
+     * Bitwise right-shift an integer value by an integer number of bits.
+     *
+     * Stack: `.., a: long, b: int -> .., r: long`
+     */
+    fun lShr() = emit(Opcodes.LSHR)
+
+    /**
+     * Logical right-shift an integer value by an integer number of bits.
+     *
+     * Stack: `.., a: int, b: int -> .., r: int`
+     */
+    fun iuShr() = emit(Opcodes.IUSHR)
+
+    /**
+     * Logical right-shift an long value by an integer number of bits.
+     *
+     * Stack: `.., a: long, b: int -> .., r: long`
+     */
+    fun luShr() = emit(Opcodes.LUSHR)
+
+
+
     ///////////
     // CASTS //
     ///////////

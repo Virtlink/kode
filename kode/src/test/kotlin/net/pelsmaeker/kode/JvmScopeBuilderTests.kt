@@ -1,18 +1,11 @@
 package net.pelsmaeker.kode
 
 import net.pelsmaeker.kode.types.*
-import net.pelsmaeker.kode.types.JvmMethodRef.Companion.getMethod
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import org.objectweb.asm.Opcodes
 import java.lang.reflect.InvocationTargetException
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /** Tests the [JvmScopeBuilder] class. */
 class JvmScopeBuilderTests {
@@ -32,7 +25,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
+        val result = compiledClass.runMethod(methodDecl, value)
 
         // Assert
         assertEquals(value, result)
@@ -49,7 +42,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
+        val result = compiledClass.runMethod(methodDecl, value)
 
         // Assert
         assertEquals(value, result)
@@ -66,7 +59,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
+        val result = compiledClass.runMethod(methodDecl, value)
 
         // Assert
         assertEquals(value, result)
@@ -83,7 +76,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
+        val result = compiledClass.runMethod(methodDecl, value)
 
         // Assert
         assertEquals(value, result)
@@ -100,7 +93,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl, value)
+        val result = compiledClass.runMethod(methodDecl, value)
 
         // Assert
         assertEquals(value, result)
@@ -135,7 +128,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act/Assert
-        compiledClass.runEvalMethod(methodDecl, 1, 2L, 3.0f, 4.0, "S")
+        compiledClass.runMethod(methodDecl, 1, 2L, 3.0f, 4.0, "S")
     }
 
     ///////////
@@ -155,7 +148,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -174,7 +167,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -193,7 +186,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -212,7 +205,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -231,7 +224,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -260,7 +253,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act/Assert
-        compiledClass.runEvalMethod(methodDecl)
+        compiledClass.runMethod(methodDecl)
     }
 
     ///////////
@@ -279,7 +272,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -297,7 +290,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -316,7 +309,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -334,7 +327,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -352,7 +345,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -370,7 +363,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -392,7 +385,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -415,7 +408,7 @@ class JvmScopeBuilderTests {
 
         // Act/Assert
         assertDoesNotThrow {
-            compiledClass.runEvalMethod(methodDecl)
+            compiledClass.runMethod(methodDecl)
         }
     }
 
@@ -432,7 +425,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -452,7 +445,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -472,7 +465,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -497,7 +490,7 @@ class JvmScopeBuilderTests {
 
         // Act/Assert
         assertDoesNotThrow {
-            compiledClass.runEvalMethod(methodDecl)
+            compiledClass.runMethod(methodDecl)
         }
     }
 
@@ -515,7 +508,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -535,7 +528,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -558,7 +551,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -583,7 +576,7 @@ class JvmScopeBuilderTests {
 
         // Act/Assert
         assertDoesNotThrow {
-            compiledClass.runEvalMethod(methodDecl)
+            compiledClass.runMethod(methodDecl)
         }
     }
 
@@ -600,7 +593,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(-1, result)
@@ -615,7 +608,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(0, result)
@@ -630,7 +623,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(1, result)
@@ -645,7 +638,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(2, result)
@@ -660,7 +653,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(3, result)
@@ -675,7 +668,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(4, result)
@@ -690,7 +683,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(5, result)
@@ -722,7 +715,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act/Assert
-        compiledClass.runEvalMethod(methodDecl)
+        compiledClass.runMethod(methodDecl)
     }
 
     @Test
@@ -735,7 +728,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value.toInt(), result)
@@ -751,7 +744,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value.toInt(), result)
@@ -766,7 +759,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(0L, result)
@@ -781,7 +774,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(1L, result)
@@ -800,7 +793,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act/Assert
-        compiledClass.runEvalMethod(methodDecl)
+        compiledClass.runMethod(methodDecl)
     }
 
     @Test
@@ -812,7 +805,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(0.0f, result)
@@ -827,7 +820,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(1.0f, result)
@@ -842,7 +835,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(2.0f, result)
@@ -862,7 +855,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act/Assert
-        compiledClass.runEvalMethod(methodDecl)
+        compiledClass.runMethod(methodDecl)
     }
 
 
@@ -875,7 +868,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(0.0, result)
@@ -890,7 +883,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(1.0, result)
@@ -909,7 +902,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act/Assert
-        compiledClass.runEvalMethod(methodDecl)
+        compiledClass.runMethod(methodDecl)
     }
 
     @Test
@@ -921,7 +914,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(null, result)
@@ -937,7 +930,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -953,7 +946,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -969,7 +962,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -985,7 +978,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -1001,7 +994,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -1085,7 +1078,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act/Assert
-        compiledClass.runEvalMethod(methodDecl)
+        compiledClass.runMethod(methodDecl)
     }
 
     //////////////////////////
@@ -1124,7 +1117,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1146,7 +1139,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1168,7 +1161,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1190,7 +1183,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1212,7 +1205,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1234,7 +1227,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1256,7 +1249,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1278,7 +1271,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1300,7 +1293,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1322,7 +1315,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1344,7 +1337,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1366,7 +1359,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1388,7 +1381,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1410,7 +1403,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1432,7 +1425,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1454,7 +1447,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1476,7 +1469,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1498,7 +1491,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1519,7 +1512,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1540,7 +1533,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1561,7 +1554,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertFalse(result)
@@ -1582,7 +1575,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1602,7 +1595,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl) as Boolean
+        val result = compiledClass.runMethod(methodDecl) as Boolean
 
         // Assert
         assertTrue(result)
@@ -1629,7 +1622,7 @@ class JvmScopeBuilderTests {
 
         // Act/Assert
         assertDoesNotThrow {
-            compiledClass.runEvalMethod(methodDecl)
+            compiledClass.runMethod(methodDecl)
         }
     }
 
@@ -1652,7 +1645,7 @@ class JvmScopeBuilderTests {
         // Act/Assert
         assertThrows<IllegalStateException> {
             try {
-                compiledClass.runEvalMethod(methodDecl)
+                compiledClass.runMethod(methodDecl)
             } catch(ex: InvocationTargetException) {
                 throw ex.cause ?: ex
             }
@@ -1669,7 +1662,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -1685,7 +1678,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -1701,7 +1694,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -1717,7 +1710,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -1733,7 +1726,7 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertEquals(value, result)
@@ -1747,63 +1740,9 @@ class JvmScopeBuilderTests {
         }
 
         // Act
-        val result = compiledClass.runEvalMethod(methodDecl)
+        val result = compiledClass.runMethod(methodDecl)
 
         // Assert
         assertNull(result)
-    }
-
-
-    
-    private fun JvmCompiledClass.runEvalMethod(methodDecl: JvmMethodDecl, vararg args: Any?): Any? {
-        val cls = this.load<Any>()
-        val instance = cls.getConstructor().newInstance()
-        val method = cls.getMethod(methodDecl.ref(this.type.ref()))
-        return method.invoke(instance, *args)
-    }
-
-    private fun buildEvalMethodWith(returnType: JvmType = JvmVoid, parameters: List<JvmParam> = emptyList(), builder: JvmScopeBuilder.() -> Unit): Pair<JvmMethodDecl, JvmCompiledClass> {
-        var methodDecl: JvmMethodDecl
-        val compiledClass = buildClassWith {
-            methodDecl = createMethod("eval", returnType, parameters, modifiers = JvmMethodModifiers.Public).apply {
-                beginCode().apply {
-                    builder()
-                }.build()
-            }.build()
-        }
-        return methodDecl to compiledClass
-    }
-
-    /**
-     * Builds a test class named `HelloWorld` with one type parameter `T`.
-     * @param builder builds the members of the class
-     * @return the compiled class
-     */
-    @OptIn(ExperimentalContracts::class)
-    private fun buildClassWith(builder: JvmClassBuilder.() -> Unit): JvmCompiledClass {
-        contract {
-            callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-        }
-        val compiledClass: JvmCompiledClass
-        JvmModuleBuilder().apply {
-            // package com.example
-            // public class HelloWorld<T>
-            compiledClass = createClass(JvmClassDecl("HelloWorld", JvmPackageDecl("com.example").ref(), signature = JvmClassSignature(
-                typeParameters = listOf(JvmTypeParam("T"))
-            )), JvmClassModifiers.Public).apply {
-
-                createDefaultConstructor(JvmMethodModifiers.Public)
-
-                builder()
-            }.build()
-        }.build()
-        try {
-            compiledClass.check()
-        } catch (ex: Throwable) {
-            println("An error occurred: ${ex.message}")
-            println(compiledClass)
-            throw ex
-        }
-        return compiledClass
     }
 }
