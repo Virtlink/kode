@@ -4,6 +4,7 @@ dokka                           = "1.7.20"
 git-version                     = "0.15.0"
 ben-manes-versions              = "0.42.0"
 asm                             = "9.4"
+kotest                          = "5.5.5"
 junit                           = "5.9.1"
 awaitility                      = "4.2.0"
 
@@ -24,6 +25,9 @@ asm                             = { module = "org.ow2.asm:asm",                 
 asm-util                        = { module = "org.ow2.asm:asm-util",                                        version.ref = "asm" }
 
 # Testing
+kotest                          = { module = "io.kotest:kotest-runner-junit5-jvm",                          version.ref = "kotest" }
+kotest-assertions               = { module = "io.kotest:kotest-assertions-core",                            version.ref = "kotest" }
+kotest-property                 = { module = "io.kotest:kotest-property",                                   version.ref = "kotest" }
 junit                           = { module = "org.junit.jupiter:junit-jupiter",                             version.ref = "junit" }
 awaitility-core                 = { module = "org.awaitility:awaitility",                                   version.ref = "awaitility" }
 awaitility-kotlin               = { module = "org.awaitility:awaitility-kotlin",                            version.ref = "awaitility" }
