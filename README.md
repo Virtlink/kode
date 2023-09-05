@@ -12,7 +12,7 @@ Add this library as a dependency to your project.
 ### Gradle
 ```kotlin
 dependencies {
-    implementation("net.pelsmaeker:kode:0.0.9-alpha")
+    implementation("net.pelsmaeker:kode:0.0.11-alpha")
 }
 ```
 
@@ -21,7 +21,7 @@ dependencies {
 <dependency>
     <groupId>net.pelsmaeker</groupId>
     <artifactId>kode</artifactId>
-    <version>0.0.9-alpha</version>
+    <version>0.0.11-alpha</version>
 </dependency>
 ```
 
