@@ -1,11 +1,11 @@
 [versions]
-kotlin                          = "1.8.10"          # https://kotlinlang.org/ (https://github.com/JetBrains/kotlin)
-dokka                           = "1.7.20"          # https://github.com/Kotlin/dokka
+kotlin                          = "1.9.10"          # https://kotlinlang.org/ (https://github.com/JetBrains/kotlin)
+dokka                           = "1.9.0"           # https://github.com/Kotlin/dokka
 gitversion                      = "1.0.0"           # https://github.com/palantir/gradle-git-version
 ben-manes-versions              = "0.46.0"          # https://github.com/ben-manes/gradle-versions-plugin
-asm                             = "9.4"             # https://asm.ow2.io/ (https://gitlab.ow2.org/asm/asm)
-kotest                          = "5.5.5"           # https://kotest.io/ (https://github.com/kotest/kotest)
-junit                           = "5.9.2"           # https://junit.org (https://github.com/junit-team/junit5)
+asm                             = "9.5"             # https://asm.ow2.io/ (https://gitlab.ow2.org/asm/asm)
+kotest                          = "5.7.1"           # https://kotest.io/ (https://github.com/kotest/kotest)
+junit                           = "5.10.0"          # https://junit.org (https://github.com/junit-team/junit5)
 awaitility                      = "4.2.0"           # https://github.com/awaitility/awaitility
 
 
